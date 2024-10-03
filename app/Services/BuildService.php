@@ -135,9 +135,7 @@ class BuildService
         $content = File::get($tempFile);
 
         // Производим замену строк на пустые
-        foreach ($wtsConfig as $removeString) {
-            $content = str_replace($removeString, '', $content);
-        }
+        $content = preg_replace('/\[[^\]]*\]\s*/', '', $content);
 
         // Записываем измененный контент обратно в временный файл
         File::put($tempFile, $content);

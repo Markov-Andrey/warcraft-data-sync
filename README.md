@@ -10,19 +10,17 @@
 2. **Удаление технических тегов** из файлов после копирования на основе конфигурации.
 3. **Управление процессом копирования** через конфигурационные файлы:
     - **`w3x.php`** — описание файлов для копирования (название, описание, необходимость копирования).
-    - **`wts.php`** — список технических тегов для удаления.
 
 ## 📁 Структура проекта
 
 - **/config/w3x.php** — список файлов для копирования: название, описание, необходимость переноса.
-- **/config/wts.php** — список технических тегов, которые будут удалены после копирования.
 - **/storage/app/donor** — директория-источник с файлами донора.
 - **/storage/app/projects/xxx.w3x** — директории реципиентов для копирования файлов и удаления тегов.
 
 ## ⚙️ Использование
 
 1. Определите файлы для копирования в `/config/w3x.php`.
-2. Определите теги для удаления в `/config/wts.php`.
+2. Паттерн удаления тегов - `[text]+many space`, например `[Thrall] `. Внимание, тег указывается в начале строки!
 3. Запустите команду:
 
    ```bash
@@ -43,19 +41,17 @@
 - Technical tag removal from files after copying, based on the configuration.
 - Process management via configuration files:
     - **`w3x.php`** — file details for copying (name, description, need for copying).
-    - **`wts.php`** — list of technical tags for removal.
 
 ## 📁 Project Structure
 
 - **/config/w3x.php** — list of files to copy: name, description, copy necessity.
-- **/config/wts.php** — list of technical tags to be removed after copying.
 - **/storage/app/donor** — source directory containing donor files.
 - **/storage/app/projects/xxx.w3x** — recipient directories for copying files and tag removal.
 
 ## ⚙️ Usage
 
-1. Define the files to copy in `/config/w3x.php`.
-2. Define the tags to remove in `/config/wts.php`.
+1. Define the files to be copied in `/config/w3x.php`.
+2. The pattern for removing tags is `[text] + many spaces`, for example, `[Thrall] `. Note that the tag is specified at the beginning of the line!
 3. Run the command:
 
    ```bash

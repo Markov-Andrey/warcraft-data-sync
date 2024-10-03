@@ -11,7 +11,7 @@ class BuildCommand extends Command
     protected $signature = 'build';
 
     // Описание команды
-    protected $description = 'This is a build command that does nothing yet';
+    protected $description = 'Donor-recipient data transfer and technical tag cleaning';
 
     // Логика выполнения команды
     public function handle()
