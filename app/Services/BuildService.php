@@ -31,11 +31,12 @@ class BuildService
                         // TODO special logic for maps
                         continue;
                     }
-                    if ($fileName == 'war3map.wts') {
+                    // TODO war3map.wts cleaner OFF
+                    // if ($fileName == 'war3map.wts') {
                         // special logic for string remover
-                        $this->processWtsFile($donorPath, $projectDirectory, $fileName);
-                        continue;
-                    }
+                        // $this->processWtsFile($donorPath, $projectDirectory, $fileName);
+                        // continue;
+                    // }
                     $this->copyFile($donorPath, $projectDirectory, $fileName);
                 }
             }
@@ -127,9 +128,6 @@ class BuildService
 
         // Создаем временную копию файла
         File::copy($sourceFile, $tempFile);
-
-        // Загружаем конфиг с заменами строк
-        $wtsConfig = config('wts.remove_string');  // Массив строк для замены
 
         // Читаем содержимое временного файла
         $content = File::get($tempFile);

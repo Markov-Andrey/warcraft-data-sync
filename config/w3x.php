@@ -8,7 +8,7 @@ return [
         'war3map.wpm'         => ['copy' => false], // passability map
         'war3map.doo'         => ['copy' => false], // info about trees
         'war3mapUnits.doo'    => ['copy' => false], // information about all objects placed on map
-        'war3map.w3i'         => ['copy' => true],  // Various information about the map, which is set in the editor in the scenario section
+        'war3map.w3i'         => ['copy' => false],  // Various information about the map, which is set in the editor in the scenario section
         'war3map.wts'         => ['copy' => true],  // String values (GUI)
         'war3mapMap.blp'      => ['copy' => false], // Minimap
         'war3map.mmp'         => ['copy' => false], // Minimap icons during initialization
@@ -40,16 +40,21 @@ return [
 
         // my assets in root folder
         // TODO Refactor required!
-        'ApothecaryWrap.blp'  => ['copy' => true],  // Texture - ApothecaryWrap
-        'AzureGlow5.blp'      => ['copy' => true],  // Texture - AzureGlow5
-        'CrimsonGlow2.blp'    => ['copy' => true],  // Texture - CrimsonGlow2
-        'LichKing.blp'        => ['copy' => true],  // Texture - LichKing
-        'RadiantGlow.blp'     => ['copy' => true],  // Texture - RadiantGlow
-        'SkyfireGunship.blp'  => ['copy' => true],  // Texture - SkyfireGunship
-        'TextureUther.blp'    => ['copy' => true],  // Texture - TextureUther
-        'ThirdRank.blp'       => ['copy' => true],  // Texture - ThirdRank
-        'VarianWrynn.blp'     => ['copy' => true],  // Texture - VarianWrynn
-        'VerdantGlow3.blp'    => ['copy' => true],  // Texture - VerdantGlow3
+        'AzureGlow4.blp'      => ['copy' => true],
+        'AzureGlow5.blp'      => ['copy' => true],
+        'Bandit_KillerV1.blp' => ['copy' => true],
+        'Bandit_KillerV2.2.blp' => ['copy' => true],
+        'CrimsonGlow2.blp' => ['copy' => true],
+        'damned_7x7_sprite.blp' => ['copy' => true],
+        'FullScreen.blp' => ['copy' => true],
+        'LichKing.blp' => ['copy' => true],
+        'LoadingScreen.blp' => ['copy' => true],
+        'Moonkin.blp' => ['copy' => true],
+        'RadiantGlow.blp' => ['copy' => true],
+        'SkyfireGunship.blp'  => ['copy' => true],
+        'ThirdRank.blp'       => ['copy' => true],
+        'VarianWrynn.blp'     => ['copy' => true],
+        'VerdantGlow3.blp'    => ['copy' => true],
     ],
 
     'directories' => [
@@ -58,6 +63,7 @@ return [
         'ReplaceableTextures'   => ['copy' => true],
         'Special'               => ['copy' => true],
         'Textures'              => ['copy' => true],
+        'UI'                    => ['copy' => true],
         'war3mapImported'       => ['copy' => true],
     ],
 ];
