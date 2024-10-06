@@ -40,16 +40,15 @@ return [
 
         // my assets in root folder
         // TODO Refactor required!
-        'AzureGlow4.blp'      => ['copy' => true],
-        'AzureGlow5.blp'      => ['copy' => true],
-        'CrimsonGlow2.blp' => ['copy' => true],
+        'AzureGlow4.blp'        => ['copy' => true],
+        'AzureGlow5.blp'        => ['copy' => true],
+        'CrimsonGlow2.blp'      => ['copy' => true],
         'damned_7x7_sprite.blp' => ['copy' => true],
-        'FullScreen.blp' => ['copy' => true],
-        'LoadingScreen.blp' => ['copy' => true],
-        'RadiantGlow.blp' => ['copy' => true],
-        'ThirdRank.blp'       => ['copy' => true],
-        'VarianWrynn.blp'     => ['copy' => true],
-        'VerdantGlow3.blp'    => ['copy' => true],
+        'FullScreen.blp'        => ['copy' => true],
+        'LoadingScreen.blp'     => ['copy' => true],
+        'RadiantGlow.blp'       => ['copy' => true],
+        'ThirdRank.blp'         => ['copy' => true],
+        'VerdantGlow3.blp'      => ['copy' => true],
     ],
 
     'directories' => [
