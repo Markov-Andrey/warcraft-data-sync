@@ -42,13 +42,10 @@ return [
         // TODO Refactor required!
         'AzureGlow4.blp'      => ['copy' => true],
         'AzureGlow5.blp'      => ['copy' => true],
-        'Bandit_KillerV1.blp' => ['copy' => true],
-        'Bandit_KillerV2.2.blp' => ['copy' => true],
         'CrimsonGlow2.blp' => ['copy' => true],
         'damned_7x7_sprite.blp' => ['copy' => true],
         'FullScreen.blp' => ['copy' => true],
         'LoadingScreen.blp' => ['copy' => true],
-        'Moonkin.blp' => ['copy' => true],
         'RadiantGlow.blp' => ['copy' => true],
         'ThirdRank.blp'       => ['copy' => true],
         'VarianWrynn.blp'     => ['copy' => true],
