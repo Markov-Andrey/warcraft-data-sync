@@ -1,48 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>W3x Configuration</title>
-</head>
-<body>
-<h1>W3x Configuration</h1>
+@extends('layouts.app')
 
-<h2>Directories</h2>
-<table border="1">
-    <thead>
-    <tr>
-        <th>Directory</th>
-        <th>Copy</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach($directories as $directoryName => $directoryData)
-        <tr>
-            <td>{{ $directoryName }}</td>
-            <td>{{ $directoryData['copy'] ? '+' : '-' }}</td>
-        </tr>
-    @endforeach
-    </tbody>
-</table>
+@section('title', 'Project Explorer')
 
-<h2>Files</h2>
-<table border="1">
-    <thead>
-    <tr>
-        <th>File</th>
-        <th>Copy</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach($files as $fileName => $fileData)
-        <tr>
-            <td>{{ $fileName }}</td>
-            <td>{{ $fileData['copy'] ? '+' : '-' }}</td>
-        </tr>
-    @endforeach
-    </tbody>
-</table>
+@section('content')
+    <p><strong>Current Path:</strong> {{ $currentPath }}</p>
 
-</body>
-</html>
+    <form method="POST" action="{{ route('updateConfig') }}" style="font-size: 25px">
+        @csrf
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; font-weight: bold;">
+            <div>Item</div>
+            <div>Copy</div>
+        </div>
+
+        @foreach ($directories as $directory)
+            <div style="display: grid; grid-template-columns: 1fr 1fr; align-items: center">
+                <a href="{{ url('/') }}?path={{ $currentPath . DIRECTORY_SEPARATOR . $directory }}">
+                    📂 {{ $directory }}
+                </a>
+                <label>
+                    <!-- Скрытое поле для значений "0" -->
+                    <input type="hidden" name="directories[{{ $directory }}]" value="0">
+                    <input type="checkbox" name="directories[{{ $directory }}]" value="1" {{ true ? 'checked' : '' }}>
+                </label>
+            </div>
+        @endforeach
+
+        @foreach ($files as $file)
+            <div style="display: grid; grid-template-columns: 1fr 1fr; align-items: center; margin-bottom: 10px;">
+                <div>
+                    📄 {{ $file }}
+                </div>
+                <label>
+                    <input type="hidden" name="files[{{ $file }}]" value="0">
+                    <input type="checkbox" name="files[{{ $file }}]" value="1" {{ true ? 'checked' : '' }}>
+                </label>
+            </div>
+        @endforeach
+
+        <div style="margin-top: 20px;">
+            <button type="submit">Save Changes</button>
+        </div>
+    </form>
+
+    @if ($currentPath !== config('w3x.parent_project'))
+        <p>
+            <a href="{{ url('/') }}?path={{ dirname($currentPath) }}">Go Back</a>
+        </p>
+    @endif
+@endsection
