@@ -19,7 +19,6 @@
                     📂 {{ $directory }}
                 </a>
                 <label>
-                    <!-- Скрытое поле для значений "0" -->
                     <input type="hidden" name="directories[{{ $directory }}]" value="0">
                     <input type="checkbox" name="directories[{{ $directory }}]" value="1" {{ true ? 'checked' : '' }}>
                 </label>

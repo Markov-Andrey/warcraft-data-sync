@@ -6,142 +6,113 @@ use Illuminate\Support\Facades\File;
 
 class ConfigService
 {
-    protected $configFileName = '.config.json';
+    protected string $configFileName = '.config.json';
 
-    // Инициализация конфигурационного файла
     public function initializeConfig(): void
     {
         $config = config('w3x');
         $parentProjectPath = $config['parent_project'];
 
         $configPath = $parentProjectPath . DIRECTORY_SEPARATOR . $this->configFileName;
+
         if (!File::exists($configPath)) {
-            File::put($configPath, '');
+            $fileTree = $this->buildFileTree($parentProjectPath);
+            File::put($configPath, json_encode($fileTree, JSON_PRETTY_PRINT));
+        } else {
+            $storedTree = json_decode(File::get($configPath), true);
+            $currentTree = $this->buildFileTree($parentProjectPath);
+            $this->syncDirectories($storedTree, $currentTree);
+            File::put($configPath, json_encode($storedTree, JSON_PRETTY_PRINT));
         }
     }
 
-    // Загрузка конфигурации
+    public function buildFileTree($directory): array
+    {
+        $fileTree = [
+            'name' => basename($directory),
+            'copy' => false,
+            'type' => 'directory',
+            'children' => [],
+        ];
+
+        $directories = File::directories($directory);
+        $files = File::files($directory);
+
+        foreach ($files as $file) {
+            $fileTree['children'][] = [
+                'name' => basename($file),
+                'copy' => false,
+                'type' => 'file',
+            ];
+        }
+        foreach ($directories as $dir) {
+            $fileTree['children'][] = $this->buildFileTree($dir);
+        }
+
+        return $fileTree;
+    }
+
+    public function syncDirectories(&$storedTree, $currentTree): void
+    {
+        $this->addNewFilesAndDirectories($storedTree, $currentTree); // Сначала добавляем новые файлы и директории
+        $this->removeDeletedFilesAndDirectories($storedTree, $currentTree); // Затем удаляем файлы и директории, которых больше нет
+        $this->updateCopyFlag($storedTree, $currentTree); // Обновляем флаг "copy" (если требуется)
+    }
+    public function addNewFilesAndDirectories(&$storedTree, $currentTree): void
+    {
+        foreach ($currentTree['children'] as $currentChild) {
+            $storedChild = $this->findChildByName($storedTree['children'], $currentChild['name']);
+
+            if (!$storedChild) {
+                $storedTree['children'][] = $currentChild;
+            } elseif ($storedChild['type'] == 'directory') {
+                $this->syncDirectories($storedChild, $currentChild);
+            }
+        }
+    }
+    public function removeDeletedFilesAndDirectories(&$storedTree, $currentTree): void
+    {
+        foreach ($storedTree['children'] as $index => $storedChild) {
+            $currentChild = $this->findChildByName($currentTree['children'], $storedChild['name']);
+
+            if (!$currentChild) {
+                unset($storedTree['children'][$index]);
+            } elseif ($storedChild['type'] == 'directory') {
+                $this->removeDeletedFilesAndDirectories($storedChild, $currentChild);
+            }
+        }
+    }
+    public function updateCopyFlag(&$storedTree, $currentTree): void
+    {
+        foreach ($storedTree['children'] as &$storedChild) {
+            $currentChild = $this->findChildByName($currentTree['children'], $storedChild['name']);
+            if ($currentChild && isset($currentChild['copy']) && $currentChild['copy'] !== false) {
+                $storedChild['copy'] = $currentChild['copy'];
+            }
+            if ($storedChild['type'] == 'directory') {
+                $this->updateCopyFlag($storedChild, $currentChild);
+            }
+        }
+    }
+    public function findChildByName($children, $name)
+    {
+        foreach ($children as $child) {
+            if ($child['name'] == $name) {
+                return $child;
+            }
+        }
+        return null;
+    }
     public function loadConfig()
     {
         $config = config('w3x');
         $parentProjectPath = $config['parent_project'];
-
         $configPath = $parentProjectPath . DIRECTORY_SEPARATOR . $this->configFileName;
         if (File::exists($configPath)) {
-            $content = File::get($configPath);
-            if (!empty($content)) {
-                return json_decode($content, true);
-            }
+            $jsonContent = File::get($configPath);
+            return json_decode($jsonContent, true);
         }
 
         return [];
     }
-
-    public function updateParameters($parentProjectPath, $data): void
-    {
-        // Загружаем текущий конфиг
-        $configData = $this->loadConfig($parentProjectPath);
-
-        // Обновляем данные для директорий
-        foreach ($data['directories'] ?? [] as $directory => $copy) {
-            if (isset($configData['directories'][$directory])) {
-                $configData['directories'][$directory]['copy'] = (bool) $copy;
-            }
-        }
-
-        // Обновляем данные для файлов
-        foreach ($data['files'] ?? [] as $file => $copy) {
-            if (isset($configData['files'][$file])) {
-                $configData['files'][$file]['copy'] = (bool) $copy;
-            }
-        }
-
-        // Сохраняем обновленный конфиг
-        $this->saveConfig($parentProjectPath, $configData);
-    }
-
-    // Синхронизация конфигурации с файловой системой
-    public function syncConfig(): void
-    {
-        $config = config('w3x');
-        $parentProjectPath = $config['parent_project'];
-
-        // Собираем все директории и файлы с параметром 'copy'
-        $directories = $this->getDirectoriesWithCopy($parentProjectPath);
-        $files = $this->getFilesWithCopy($parentProjectPath);
-
-        // Получаем текущие данные конфига
-        $configData = $this->loadConfig($parentProjectPath);
-
-        // Добавляем или обновляем директории в конфиге
-        foreach ($directories as $dirName => $dirData) {
-            if (!isset($configData['directories'][$dirName])) {
-                $configData['directories'][$dirName] = $dirData;
-            } else {
-                $configData['directories'][$dirName] = array_merge($configData['directories'][$dirName], $dirData);
-            }
-        }
-
-        // Добавляем или обновляем файлы в конфиге
-        foreach ($files as $fileName => $fileData) {
-            if (!isset($configData['files'][$fileName])) {
-                $configData['files'][$fileName] = $fileData;
-            } else {
-                $configData['files'][$fileName] = array_merge($configData['files'][$fileName], $fileData);
-            }
-        }
-
-        // Удаляем из конфига элементы, которые отсутствуют в файловой системе
-        $configData['directories'] = array_filter($configData['directories'], function ($dirName) use ($directories) {
-            // Преобразуем путь в строку и проверяем, существует ли он в новых директориях
-            return in_array($dirName, array_map(fn($dir) => basename($dir), array_keys($directories)));
-        }, ARRAY_FILTER_USE_KEY);
-
-        $configData['files'] = array_filter($configData['files'], function ($fileName) use ($files) {
-            // Преобразуем путь в строку и проверяем, существует ли он в новых файлах
-            return in_array($fileName, array_map(fn($file) => basename($file), array_keys($files)));
-        }, ARRAY_FILTER_USE_KEY);
-
-        // Сохраняем обновленный конфиг
-        $this->saveConfig($parentProjectPath, $configData);
-    }
-
-    private function getDirectoriesWithCopy(string $path, array $directories = []): array
-    {
-        if (File::isDirectory($path)) {
-            // Собираем все директории
-            foreach (File::directories($path) as $dir) {
-                $dirName = basename($dir);
-                // Добавляем в массив с параметром 'copy' (по умолчанию false)
-                $directories[$dirName] = ['copy' => false];
-                // Рекурсивно обрабатываем вложенные директории
-                $directories = $this->getDirectoriesWithCopy($dir, $directories);
-            }
-        }
-
-        return $directories;
-    }
-
-    private function getFilesWithCopy(string $path, array $files = []): array
-    {
-        if (File::isDirectory($path)) {
-            // Собираем все файлы
-            foreach (File::files($path) as $file) {
-                $fileName = $file->getFilename();
-                // Добавляем в массив с параметром 'copy' (по умолчанию false)
-                $files[$fileName] = ['copy' => false];
-            }
-        }
-
-        return $files;
-    }
-
-    // Сохранение конфигурации
-    public function saveConfig($parentProjectPath, $configData): void
-    {
-        $configPath = $parentProjectPath . DIRECTORY_SEPARATOR . $this->configFileName;
-        File::put($configPath, json_encode($configData, JSON_PRETTY_PRINT));
-    }
 }
-
-
