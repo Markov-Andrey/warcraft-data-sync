@@ -28,108 +28,36 @@ class W3xController extends Controller
         $this->configService->initializeConfig();
         $json = $this->configService->loadConfig();
 
-        $currentStructure = $this->buildCurrentStructure($currentPath);
+        $directories = File::directories($currentPath);
+        $files = File::files($currentPath);
 
-        $this->syncWithConfig($currentStructure, $json);
-
-
-        $directories = array_map('basename', File::directories($currentPath));
-        $files = array_map('basename', File::files($currentPath));
+        $jsonPaths = [];
+        foreach ($json as $item) {
+            $jsonPaths[$item['path']] = $item['copy'];
+        }
+        $directories = array_map(function ($directory) use ($jsonPaths) {
+            $path = $directory;
+            return [
+                'path' => $path,
+                'name' => basename($directory),
+                'type' => 'directory',
+                'copy' => $jsonPaths[$path] ?? false,
+            ];
+        }, $directories);
+        $files = array_map(function ($file) use ($jsonPaths) {
+            $path = $file->getRealPath();
+            return [
+                'path' => $path,
+                'name' => $file->getBasename(),
+                'type' => 'file',
+                'copy' => $jsonPaths[$path] ?? false,
+            ];
+        }, $files);
 
         return view('project', [
             'directories' => $directories,
             'files' => $files,
             'currentPath' => $currentPath,
         ]);
-    }
-
-    public function syncWithConfig(&$currentStructure, &$config)
-    {
-        foreach ($currentStructure['children'] as &$child) {
-            $configChild = $this->findChildInConfig($config['children'], $child['name']);
-
-            if ($configChild) {
-                // Синхронизируем параметр "copy" из конфигурации
-                $child['copy'] = $configChild['copy'];
-            }
-
-            // Если это директория, рекурсивно синхронизируем вложенные элементы
-            if ($child['type'] == 'directory') {
-                $this->syncWithConfig($child, $configChild);
-            }
-        }
-
-        // Проверяем, если в конфиге есть файлы, которых нет в текущей структуре, добавляем их
-        foreach ($config['children'] as $configChild) {
-            if ($configChild['type'] == 'file' && !in_array($configChild['name'], array_column($currentStructure['children'], 'name'))) {
-                $currentStructure['children'][] = [
-                    'name' => $configChild['name'],
-                    'copy' => $configChild['copy'],
-                    'type' => 'file',
-                ];
-            }
-        }
-    }
-
-    public function findChildInConfig($configChildren, $name)
-    {
-        foreach ($configChildren as $configChild) {
-            if ($configChild['name'] == $name) {
-                return $configChild;
-            }
-        }
-        return null;
-    }
-
-    public function buildCurrentStructure($directory)
-    {
-        $fileTree = [
-            'name' => basename($directory),
-            'copy' => false,
-            'type' => 'directory',
-            'children' => [],
-        ];
-
-        $directories = File::directories($directory);
-        $files = File::files($directory);
-
-        foreach ($files as $file) {
-            $fileTree['children'][] = [
-                'name' => basename($file),
-                'copy' => false,
-                'type' => 'file',
-            ];
-        }
-
-        foreach ($directories as $dir) {
-            $fileTree['children'][] = $this->buildCurrentStructure($dir);
-        }
-
-        return $fileTree;
-    }
-
-    public function compareAndUpdateFiles(&$currentStructure, $config)
-    {
-        foreach ($currentStructure['children'] as &$child) {
-            $configChild = $this->findChildInConfig($config['children'], $child['name']);
-
-            if ($configChild) {
-                $child['copy'] = $configChild['copy'];
-            }
-
-            if ($child['type'] == 'directory') {
-                $this->compareAndUpdateFiles($child, $configChild);
-            }
-        }
-
-        foreach ($config['children'] as $configChild) {
-            if ($configChild['type'] == 'file' && !in_array($configChild['name'], array_column($currentStructure['children'], 'name'))) {
-                $currentStructure['children'][] = [
-                    'name' => $configChild['name'],
-                    'copy' => $configChild['copy'],
-                    'type' => 'file',
-                ];
-            }
-        }
     }
 }

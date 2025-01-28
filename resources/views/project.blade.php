@@ -15,12 +15,12 @@
 
         @foreach ($directories as $directory)
             <div style="display: grid; grid-template-columns: 1fr 1fr; align-items: center">
-                <a href="{{ url('/') }}?path={{ $currentPath . DIRECTORY_SEPARATOR . $directory }}">
-                    📂 {{ $directory }}
+                <a href="{{ url('/') }}?path={{ $directory['path'] }}">
+                    📂 {{ $directory['name'] }}
                 </a>
                 <label>
-                    <input type="hidden" name="directories[{{ $directory }}]" value="0">
-                    <input type="checkbox" name="directories[{{ $directory }}]" value="1" {{ true ? 'checked' : '' }}>
+                    <input type="hidden" name="directories[{{ $directory['name'] }}]" value="0">
+                    <input type="checkbox" name="directories[{{ $directory['name'] }}]" value="1" {{ $directory['copy'] ? 'checked' : '' }}>
                 </label>
             </div>
         @endforeach
@@ -28,11 +28,11 @@
         @foreach ($files as $file)
             <div style="display: grid; grid-template-columns: 1fr 1fr; align-items: center; margin-bottom: 10px;">
                 <div>
-                    📄 {{ $file }}
+                    📄 {{ $file['name'] }}
                 </div>
                 <label>
-                    <input type="hidden" name="files[{{ $file }}]" value="0">
-                    <input type="checkbox" name="files[{{ $file }}]" value="1" {{ true ? 'checked' : '' }}>
+                    <input type="hidden" name="files[{{ $file['name'] }}]" value="0">
+                    <input type="checkbox" name="files[{{ $file['name'] }}]" value="1" {{ $file['copy'] ? 'checked' : '' }}>
                 </label>
             </div>
         @endforeach
