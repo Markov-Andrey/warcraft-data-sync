@@ -1,4 +1,8 @@
-<div style="display: grid; grid-template-columns: 1fr 1fr; align-items: center; margin-bottom: 10px;">
+<div
+    style="display: grid; grid-template-columns: 70% 50px; align-items: center; border-bottom: 1px solid black;"
+    onmouseover="this.style.backgroundColor='#DCDCDC'"
+    onmouseout="this.style.backgroundColor=''"
+>
     @if ($itemType === 'directory')
         <a href="{{ url('/') }}?path={{ $item['path'] }}" style="color: {{ $item['validated'] ? 'black' : 'green' }};">
             📂 {{ $item['name'] }}
@@ -9,7 +13,7 @@
         </div>
     @endif
     <label>
-        <input type="hidden" name="{{ $itemType }}s[{{ $item['path'] }}]" value="0">
-        <input type="checkbox" name="{{ $itemType }}s[{{ $item['path'] }}]" value="1" {{ $item['copy'] ? 'checked' : '' }}>
+        <input type="hidden" name="{{ $itemType }}s[{{ $item['path'] }}]" value="0"  style="width: 25px; height: 25px;">
+        <input type="checkbox" name="{{ $itemType }}s[{{ $item['path'] }}]" value="1" {{ $item['copy'] ? 'checked' : '' }}  style="width: 25px; height: 25px;">
     </label>
 </div>

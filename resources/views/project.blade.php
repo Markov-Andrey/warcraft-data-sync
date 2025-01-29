@@ -9,7 +9,7 @@
         <div>{{ $project['name'] }}</div>
     @endforeach
 
-    <div style="font-size: 25px">
+    <div style="font-size: 15px">
         @csrf
         <p></p>
         <div style="display: grid; grid-template-columns: 1fr 1fr; font-weight: bold;">
@@ -19,7 +19,7 @@
 
         @if ($currentPath !== config('w3x.parent_project'))
             <div>
-                <a href="{{ url('/') }}?path={{ rtrim(dirname($currentPath), '/') }}">
+                <a href="{{ url('/') }}?path={{ rtrim(dirname($currentPath), '/') }}" style="font-size: 25px">
                     ...
                 </a>
             </div>

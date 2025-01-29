@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'parent_project' => 'C:\\Program Files\\OSPanel\\domains\\w3l\\storage\\app\\donor',
+    'parent_project' => 'C:\\Program Files\\OSPanel\\domains\\w3l\\storage\\app\\WC3LegendsClassicBuild.w3x',
     'child_projects' => [
         'alterac' => [
             'name' => 'Alterac',
