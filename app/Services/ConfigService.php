@@ -58,6 +58,7 @@ class ConfigService
                 'name' => $file->getBasename(),
                 'type' => 'file',
                 'copy' => false,
+                'copy_child' => '',
                 'validated' => false,
             ];
         }
@@ -68,6 +69,7 @@ class ConfigService
                 'name' => basename($dir),
                 'type' => 'directory',
                 'copy' => false,
+                'copy_child' => '',
                 'validated' => false,
             ];
             $fileTree = array_merge($fileTree, $this->buildFileTree($dir));
@@ -94,7 +96,7 @@ class ConfigService
      * @param bool $copy Новый статус 'copy'
      * @return bool Успешно ли обновлен файл
      */
-    public function updateCopyStatus(string $path, bool $copy)
+    public function updateCopyStatus(string $path, bool $copy): bool
     {
         if (!File::exists($this->configPath)) {
             return false;
@@ -104,6 +106,26 @@ class ConfigService
         foreach ($config as &$item) {
             if ($item['path'] === $path) {
                 $item['copy'] = $copy;
+                $updated = true;
+                break;
+            }
+        }
+        if ($updated) {
+            File::put($this->configPath, json_encode($config, JSON_PRETTY_PRINT));
+        }
+
+        return $updated;
+    }
+    public function updateCopyChild(string $path, string $child): bool
+    {
+        if (!File::exists($this->configPath)) {
+            return false;
+        }
+        $config = json_decode(File::get($this->configPath), true);
+        $updated = false;
+        foreach ($config as &$item) {
+            if ($item['path'] === $path) {
+                $item['copy_child'] = $child;
                 $updated = true;
                 break;
             }

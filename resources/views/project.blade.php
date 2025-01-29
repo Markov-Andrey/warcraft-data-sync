@@ -10,11 +10,11 @@
     @endforeach
 
     <div style="font-size: 15px">
-        @csrf
         <p></p>
-        <div style="display: grid; grid-template-columns: 70% 50px; font-weight: bold;">
+        <div style="display: grid; grid-template-columns: 70% 50px 150px; font-weight: bold;">
             <div>Item</div>
             <div>Copy</div>
+            <div>Child Project</div>
         </div>
 
         @if ($currentPath !== config('w3x.parent_project'))
@@ -42,44 +42,36 @@
         @endforeach
 
         <div style="margin-top: 20px;">
-            <button type="submit">All new files checked</button>
+            <button type="submit" onclick="commitFiles()">All new files checked</button>
         </div>
     </div>
 @endsection
 
 @push('scripts')
     <script>
-        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                let path = this.name.replace(/^directorys\[|\]$/g, '');
-                path = path.replace(/^files\[|\]$/g, '');
-
-                const rootPath = @json($rootPath);
-                path = path.replace(rootPath + '\\', '');
-
-                const copy = this.checked ? 1 : 0;
-
-                fetch('/update-copy-status', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        path: path,
-                        copy: copy
-                    })
+        function updateCheckboxChange(itemPath, checkbox) {
+            const path = cleanPath(itemPath, @json($rootPath));
+            const copy = checkbox.checked ? 1 : 0;
+            fetch('/update-copy-status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    path: path,
+                    copy: copy
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Updated:', data);
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-            });
-        });
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Updated:', data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
 
-        document.querySelector('button[type="submit"]').addEventListener('click', function(event) {
+        function commitFiles() {
             fetch('/commit', {
                 method: 'GET',
             })
@@ -88,11 +80,43 @@
                     console.log('Commit successful:', data);
                     if (data.success) {
                         location.reload();
+                    } else {
+                        console.error('Error in commit:', data.message);
                     }
                 })
                 .catch(error => {
                     console.error('Error during commit:', error);
                 });
-        });
+        }
+
+        function updateParentValue(itemPath, value) {
+            const path = cleanPath(itemPath, @json($rootPath));
+            fetch('/update-copy-child', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    path: path,
+                    child: value
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log("Commit successful");
+                    } else {
+                        console.log("Error during commit");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error during commit:", error);
+                });
+        }
+        function cleanPath(path, rootPath) {
+            path = path.replace(/^directorys\[|\]$/g, '');
+            path = path.replace(/^files\[|\]$/g, '');
+            return path.replace(rootPath + '\\', '');
+        }
     </script>
 @endpush

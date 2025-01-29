@@ -27,6 +27,7 @@ class W3xController extends Controller
 
         $this->configService->initializeConfig();
         $jsonCopy = collect($this->configService->loadConfig())->pluck('copy', 'path');
+        $jsonCopyChild = collect($this->configService->loadConfig())->pluck('copy_child', 'path');
         $jsonValid = collect($this->configService->loadConfig())->pluck('validated', 'path');
 
         $items = collect(File::directories($currentPath))
@@ -37,6 +38,7 @@ class W3xController extends Controller
                 'name' => basename($item),
                 'type' => is_string($item) ? 'directory' : 'file',
                 'copy' => $jsonCopy[$relativePath] ?? false,
+                'copy_child' => $jsonCopyChild[$relativePath] ?? '',
                 'validated' => $jsonValid[$relativePath] ?? false,
             ])
             ->groupBy('type');
