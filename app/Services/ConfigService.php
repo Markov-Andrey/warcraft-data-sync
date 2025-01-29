@@ -31,6 +31,11 @@ class ConfigService
 
     public function syncData(&$storedTree, $fileTree): void
     {
+        $actualPaths = array_column($fileTree, 'path');
+        $storedTree = array_filter($storedTree, function ($item) use ($actualPaths) {
+            return in_array($item['path'], $actualPaths);
+        });
+        $storedTree = array_values($storedTree);
         $existingPaths = array_column($storedTree, 'path');
 
         foreach ($fileTree as $newItem) {

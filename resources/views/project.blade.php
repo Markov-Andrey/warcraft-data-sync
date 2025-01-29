@@ -81,6 +81,9 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log('Commit successful:', data);
+                    if (data.success) {
+                        location.reload();
+                    }
                 })
                 .catch(error => {
                     console.error('Error during commit:', error);
