@@ -26,37 +26,24 @@ class W3xController extends Controller
         }
 
         $this->configService->initializeConfig();
-        $json = $this->configService->loadConfig();
+        $jsonCopy = collect($this->configService->loadConfig())->pluck('copy', 'path');
+        $jsonValid = collect($this->configService->loadConfig())->pluck('validated', 'path');
 
-        $directories = File::directories($currentPath);
-        $files = File::files($currentPath);
-
-        $jsonPaths = [];
-        foreach ($json as $item) {
-            $jsonPaths[$item['path']] = $item['copy'];
-        }
-        $directories = array_map(function ($directory) use ($jsonPaths) {
-            $path = $directory;
-            return [
-                'path' => $path,
-                'name' => basename($directory),
-                'type' => 'directory',
-                'copy' => $jsonPaths[$path] ?? false,
-            ];
-        }, $directories);
-        $files = array_map(function ($file) use ($jsonPaths) {
-            $path = $file->getRealPath();
-            return [
-                'path' => $path,
-                'name' => $file->getBasename(),
-                'type' => 'file',
-                'copy' => $jsonPaths[$path] ?? false,
-            ];
-        }, $files);
+        $items = collect(File::directories($currentPath))
+            ->merge(File::files($currentPath))
+            ->map(fn($item) => [
+                'path' => $path = is_string($item) ? $item : $item->getRealPath(),
+                'name' => basename($item),
+                'type' => is_string($item) ? 'directory' : 'file',
+                'copy' => $jsonCopy[$path] ?? false,
+                'validated' => $jsonValid[$path] ?? false,
+            ])
+            ->groupBy('type');
 
         return view('project', [
-            'directories' => $directories,
-            'files' => $files,
+            'child_projects' => $config['child_projects'] ?? [],
+            'directories' => $items['directory'] ?? [],
+            'files' => $items['file'] ?? [],
             'currentPath' => $currentPath,
         ]);
     }

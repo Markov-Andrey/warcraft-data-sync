@@ -12,6 +12,7 @@
 <main>
     @yield('content')
 </main>
+@stack('scripts')
 
 <footer></footer>
 </body>
