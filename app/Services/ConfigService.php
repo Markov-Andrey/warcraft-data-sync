@@ -48,26 +48,29 @@ class ConfigService
     public function buildFileTree($directory): array
     {
         $fileTree = [];
+        $rootPath = config('w3x.parent_project');
         $directories = File::directories($directory);
         $files = File::files($directory);
         foreach ($files as $file) {
+            $relativePath = str_replace($rootPath . DIRECTORY_SEPARATOR, '', $file->getPathname());
             $fileTree[] = [
-                'path' => $file->getRealPath(),
+                'path' => $relativePath,
                 'name' => $file->getBasename(),
                 'type' => 'file',
                 'copy' => false,
                 'validated' => false,
             ];
         }
-        foreach ($directories as $directory) {
+        foreach ($directories as $dir) {
+            $relativePath = str_replace($rootPath . DIRECTORY_SEPARATOR, '', $dir);
             $fileTree[] = [
-                'path' => $directory,
-                'name' => basename($directory),
+                'path' => $relativePath,
+                'name' => basename($dir),
                 'type' => 'directory',
                 'copy' => false,
                 'validated' => false,
             ];
-            $fileTree = array_merge($fileTree, $this->buildFileTree($directory));
+            $fileTree = array_merge($fileTree, $this->buildFileTree($dir));
         }
 
         return $fileTree;

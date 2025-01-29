@@ -33,14 +33,16 @@ class W3xController extends Controller
             ->merge(File::files($currentPath))
             ->map(fn($item) => [
                 'path' => $path = is_string($item) ? $item : $item->getRealPath(),
+                'relativePath' => $relativePath = str_replace($parentProjectPath . DIRECTORY_SEPARATOR, '', $path),
                 'name' => basename($item),
                 'type' => is_string($item) ? 'directory' : 'file',
-                'copy' => $jsonCopy[$path] ?? false,
-                'validated' => $jsonValid[$path] ?? false,
+                'copy' => $jsonCopy[$relativePath] ?? false,
+                'validated' => $jsonValid[$relativePath] ?? false,
             ])
             ->groupBy('type');
 
         return view('project', [
+            'rootPath' => $parentProjectPath,
             'child_projects' => $config['child_projects'] ?? [],
             'directories' => $items['directory'] ?? [],
             'files' => $items['file'] ?? [],

@@ -53,6 +53,10 @@
             checkbox.addEventListener('change', function() {
                 let path = this.name.replace(/^directorys\[|\]$/g, '');
                 path = path.replace(/^files\[|\]$/g, '');
+
+                const rootPath = @json($rootPath);
+                path = path.replace(rootPath + '\\', '');
+
                 const copy = this.checked ? 1 : 0;
 
                 fetch('/update-copy-status', {
@@ -74,6 +78,7 @@
                     });
             });
         });
+
         document.querySelector('button[type="submit"]').addEventListener('click', function(event) {
             fetch('/commit', {
                 method: 'GET',
