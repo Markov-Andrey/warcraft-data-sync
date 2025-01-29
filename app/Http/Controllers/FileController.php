@@ -51,4 +51,13 @@ class FileController extends Controller
             return response()->json(['error' => 'Path not found in config'], 404);
         }
     }
+    public function copyChild()
+    {
+        $updated = $this->configService->copyChildFiles();
+        if ($updated) {
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['error' => 'Path not found in config'], 404);
+        }
+    }
 }

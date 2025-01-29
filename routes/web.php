@@ -7,3 +7,4 @@ Route::get('/', [W3xController::class, 'index']);
 Route::post('/update-copy-status', [App\Http\Controllers\FileController::class, 'updateCopyStatus']);
 Route::post('/update-copy-child', [App\Http\Controllers\FileController::class, 'updateCopyChild']);
 Route::get('/commit', [App\Http\Controllers\FileController::class, 'updateValidateStatus']);
+Route::get('/copy-child', [App\Http\Controllers\FileController::class, 'copyChild']);

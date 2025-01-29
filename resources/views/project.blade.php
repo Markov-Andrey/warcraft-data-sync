@@ -9,6 +9,15 @@
         <div>{{ $project['name'] }}</div>
     @endforeach
 
+    <div style="display: flex; gap: 12px;">
+        <div style="margin-top: 20px;">
+            <button type="submit" onclick="commitFiles()">✅ All new files checked</button>
+        </div>
+        <div style="margin-top: 20px;">
+            <button type="submit" onclick="copyChild()">🔄 Sync to Child</button>
+        </div>
+    </div>
+
     <div style="font-size: 15px">
         <p></p>
         <div style="display: grid; grid-template-columns: 70% 50px 150px; font-weight: bold;">
@@ -40,10 +49,6 @@
             @endphp
             @include('partials.file-directory-row', ['item' => $item, 'itemType' => $itemType])
         @endforeach
-
-        <div style="margin-top: 20px;">
-            <button type="submit" onclick="commitFiles()">All new files checked</button>
-        </div>
     </div>
 @endsection
 
@@ -70,7 +75,6 @@
                     console.error('Error:', error);
                 });
         }
-
         function commitFiles() {
             fetch('/commit', {
                 method: 'GET',
@@ -88,7 +92,23 @@
                     console.error('Error during commit:', error);
                 });
         }
-
+        function copyChild() {
+            fetch('/copy-child', {
+                method: 'GET',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Commit successful:', data);
+                    if (data.success) {
+                        // location.reload();
+                    } else {
+                        console.error('Error in commit:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error during commit:', error);
+                });
+        }
         function updateParentValue(itemPath, value) {
             const path = cleanPath(itemPath, @json($rootPath));
             fetch('/update-copy-child', {

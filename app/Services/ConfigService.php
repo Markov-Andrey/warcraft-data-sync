@@ -154,4 +154,63 @@ class ConfigService
         }
         return true;
     }
+    public function copyChildFiles(): bool
+    {
+        if (!File::exists($this->configPath)) {
+            return false;
+        }
+
+        $child_projects = config('w3x.child_projects');
+        $config = json_decode(File::get($this->configPath), true);
+
+        foreach ($child_projects as $projectKey => $project) {
+
+            foreach ($config as $item) {
+                if ($item['copy']) {
+                    if (($item['copy_child']) !== '') {
+                        $copyChildArray = explode(',', $item['copy_child']);
+                        if (!in_array($project['name'], $copyChildArray)) {
+                            continue;
+                        }
+                    }
+                    $targetPath = $project['path'] . DIRECTORY_SEPARATOR . $item['path'];
+
+                    if ($item['type'] === 'directory') {
+                        if (!File::exists($targetPath)) {
+                            File::makeDirectory($targetPath, 0777, true);
+                        }
+                        $this->copyFilesRecursive($this->parentProjectPath . DIRECTORY_SEPARATOR . $item['path'], $targetPath);
+                    }
+                    elseif ($item['type'] === 'file') {
+                        $sourceFile = $this->parentProjectPath . DIRECTORY_SEPARATOR . $item['path'];
+                        if (File::exists($sourceFile)) {
+                            $targetDir = dirname($targetPath);
+                            if (!File::exists($targetDir)) {
+                                File::makeDirectory($targetDir, 0777, true);
+                            }
+                            File::copy($sourceFile, $targetPath);
+                        }
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+    private function copyFilesRecursive($sourceDir, $targetDir)
+    {
+        $files = File::allFiles($sourceDir);
+
+        foreach ($files as $file) {
+            $relativePath = str_replace($sourceDir . DIRECTORY_SEPARATOR, '', $file->getRealPath());
+            $targetFile = $targetDir . DIRECTORY_SEPARATOR . $relativePath;
+
+            $targetDirPath = dirname($targetFile);
+            if (!File::exists($targetDirPath)) {
+                File::makeDirectory($targetDirPath, 0777, true);
+            }
+
+            File::copy($file->getRealPath(), $targetFile);
+        }
+    }
 }
