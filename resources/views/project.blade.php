@@ -12,7 +12,7 @@
     <div style="font-size: 15px">
         @csrf
         <p></p>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; font-weight: bold;">
+        <div style="display: grid; grid-template-columns: 70% 50px; font-weight: bold;">
             <div>Item</div>
             <div>Copy</div>
         </div>
