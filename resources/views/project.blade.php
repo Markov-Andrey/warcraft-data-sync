@@ -42,7 +42,7 @@
         @endforeach
 
         <div style="margin-top: 20px;">
-            <button type="submit">Commit</button>
+            <button type="submit">All new files checked</button>
         </div>
     </div>
 @endsection
