@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\File;
 
 class ConfigService
 {
-    protected string $configFileName = '.config.json';
+    protected string $configFileName = '.files_config.json';
     protected string $configPath;
     protected string $parentProjectPath;
     public function __construct()
