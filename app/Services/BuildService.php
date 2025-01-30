@@ -32,11 +32,11 @@ class BuildService
                         continue;
                     }
                     // TODO war3map.wts cleaner OFF
-                    // if ($fileName == 'war3map.wts') {
+                     if ($fileName == 'war3map.wts') {
                         // special logic for string remover
-                        // $this->processWtsFile($donorPath, $projectDirectory, $fileName);
-                        // continue;
-                    // }
+                         $this->processWtsFile($donorPath, $projectDirectory, $fileName);
+                         continue;
+                     }
                     $this->copyFile($donorPath, $projectDirectory, $fileName);
                 }
             }
