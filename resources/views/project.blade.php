@@ -23,6 +23,9 @@
         <div class="page__button">
             <button type="submit" onclick="copyChild()">🔄 Sync to Child</button>
         </div>
+        <div class="page__button">
+            <button type="submit" onclick="setBuild()">🛠 Compile Build</button>
+        </div>
     </div>
 
     <div class="page__file-list">
@@ -113,6 +116,23 @@
                 })
                 .catch(error => {
                     console.error('Error during commit:', error);
+                });
+        }
+        function setBuild() {
+            fetch('/set-build', {
+                method: 'GET',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Build successful:', data);
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        console.error('Error in build:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error during build:', error);
                 });
         }
         function updateParentValue(itemPath, value) {

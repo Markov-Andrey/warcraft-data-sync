@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\BuildGameService;
 use App\Services\ConfigService;
 use App\Services\FileProcessorService;
 use Illuminate\Http\Request;
@@ -55,6 +56,15 @@ class FileController extends Controller
     public function copyChild()
     {
         $updated = FileProcessorService::copyChildFiles();
+        if ($updated) {
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['error' => 'Path not found in config'], 404);
+        }
+    }
+    public function setBuild()
+    {
+        $updated = (new \App\Services\BuildGameService)->buildAll();
         if ($updated) {
             return response()->json(['success' => true]);
         } else {

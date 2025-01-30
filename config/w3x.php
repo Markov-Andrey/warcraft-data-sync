@@ -12,6 +12,7 @@ return [
             'path' => 'C:\\Games\\OpenServer\\domains\\warcraft-data-sync\\storage\\app\\projects\\Silithus.w3x',
         ],
     ],
+    'build_output_path' => 'C:\\Games\\OpenServer\\domains\\warcraft-data-sync\\storage\\app\\builds',
     'files' => [
         'war3map.j' => ['copy' => true], // code
         'war3map.w3e' => ['copy' => false], // terrain texturing
