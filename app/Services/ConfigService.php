@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 
 class ConfigService
 {
@@ -181,7 +182,6 @@ class ConfigService
 
         foreach ($child_projects as $project) {
             foreach ($config as $item) {
-                // Пропускаем, если не нужно копировать
                 if ($item['copy'] && (!$item['copy_child'] || in_array($project['name'], explode(',', $item['copy_child'])))) {
                     $targetPath = $project['path'] . DIRECTORY_SEPARATOR . $item['path'];
 
@@ -191,7 +191,6 @@ class ConfigService
                         }
                         $this->copyFilesRecursive($this->parentProjectPath . DIRECTORY_SEPARATOR . $item['path'], $targetPath);
                     } elseif ($item['type'] === 'file') {
-                        // Если файл существует, копируем его в проект
                         $sourceFile = $this->parentProjectPath . DIRECTORY_SEPARATOR . $item['path'];
                         if (File::exists($sourceFile)) {
                             $targetDir = dirname($targetPath);
@@ -199,6 +198,8 @@ class ConfigService
                                 File::makeDirectory($targetDir, 0777, true);
                             }
                             File::copy($sourceFile, $targetPath);
+
+                            // Передаем **ВЕСЬ** $replacePatterns, а не `war3map.wts`
                             $this->processFileWithPatterns($replacePatterns, $targetPath, $project['name']);
                         }
                     }
@@ -217,11 +218,10 @@ class ConfigService
         foreach ($patterns as $file => $filePatterns) {
             if ($file === basename($filePath)) {
                 foreach ($filePatterns as $pattern => $replacement) {
-                    if (strripos($replacement, ':project_name')) {
-                        $content = preg_replace('/:project_name/', $projectName, $content);
-                    } else {
-                        $content = preg_replace($pattern, $replacement, $content);
+                    if (str_contains($replacement, ':project_name')) {
+                        $replacement = str_replace(':project_name', $projectName, $replacement);
                     }
+                    $content = preg_replace($pattern, $replacement, $content);
                 }
             }
         }

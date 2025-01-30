@@ -1,15 +1,15 @@
 <?php
 
 return [
-    'parent_project' => 'C:\\Program Files\\OSPanel\\domains\\w3l\\storage\\app\\WC3LegendsClassicBuild.w3x',
+    'parent_project' => 'C:\\Users\\User\\Documents\\Warcraft III\\Maps\\AMar\\WC3LegendsClassicBuild.w3x',
     'child_projects' => [
         'alterac' => [
             'name' => 'Alterac',
-            'path' => 'C:\\Program Files\\OSPanel\\domains\\w3l\\storage\\app\\projects\\Alterac.w3x',
+            'path' => 'C:\\Games\\OpenServer\\domains\\warcraft-data-sync\\storage\\app\\projects\\Alterac.w3x',
         ],
         'silithus' => [
             'name' => 'Silithus',
-            'path' => 'C:\\Program Files\\OSPanel\\domains\\w3l\\storage\\app\\projects\\Silithus.w3x',
+            'path' => 'C:\\Games\\OpenServer\\domains\\warcraft-data-sync\\storage\\app\\projects\\Silithus.w3x',
         ],
     ],
     'files' => [
