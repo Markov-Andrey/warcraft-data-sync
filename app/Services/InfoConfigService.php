@@ -21,4 +21,9 @@ class InfoConfigService
     {
         self::updateTimestamp('last_checked');
     }
+
+    public static function lastBuild(): void
+    {
+        self::updateTimestamp('last_build');
+    }
 }
