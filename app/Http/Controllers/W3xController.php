@@ -26,9 +26,10 @@ class W3xController extends Controller
         }
 
         $this->configService->initializeConfig();
-        $jsonCopy = collect($this->configService->loadConfig())->pluck('copy', 'path');
-        $jsonCopyChild = collect($this->configService->loadConfig())->pluck('copy_child', 'path');
-        $jsonValid = collect($this->configService->loadConfig())->pluck('validated', 'path');
+        $jsonCopy = collect($this->configService->loadConfigFiles())->pluck('copy', 'path');
+        $jsonCopyChild = collect($this->configService->loadConfigFiles())->pluck('copy_child', 'path');
+        $jsonValid = collect($this->configService->loadConfigFiles())->pluck('validated', 'path');
+        $configCurrent = collect($this->configService->loadConfigCurrent());
 
         $items = collect(File::directories($currentPath))
             ->merge(File::files($currentPath))
@@ -44,6 +45,7 @@ class W3xController extends Controller
             ->groupBy('type');
 
         return view('project', [
+            'configCurrent' => $configCurrent,
             'rootPath' => $parentProjectPath,
             'child_projects' => $config['child_projects'] ?? [],
             'directories' => $items['directory'] ?? [],

@@ -4,6 +4,13 @@
 
 @section('content')
     <p class="page__current-path"><strong>Current Path:</strong> {{ $currentPath }}</p>
+    <div class="page__current-path">
+        <div><strong>Инфо:</strong></div>
+        <div><strong>Текущий проект:</strong> {{$configCurrent['current_project']}}</div>
+        <div><strong>Последняя проверка:</strong> {{$configCurrent['last_checked']}}</div>
+        <div><strong>Последняя синхронизация:</strong> {{$configCurrent['last_synced']}}</div>
+        <div><strong>Последний билд:</strong> {{$configCurrent['last_build']}}</div>
+    </div>
     <p class="page__child-projects"><strong>Child Projects:</strong></p>
     @foreach($child_projects as $project)
         <div class="page__child-project">{{ $project['name'] }}</div>

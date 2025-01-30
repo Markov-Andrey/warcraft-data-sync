@@ -6,22 +6,23 @@ use Illuminate\Support\Facades\File;
 
 class ConfigService
 {
-
-    /**
-     * Загрузка конфига
-     */
-    public function loadConfig(): array
+    public function loadConfigFiles(): array
     {
         $configPath = PathService::getConfigFilePath();
         return File::exists($configPath) ? json_decode(File::get($configPath), true) : [];
     }
-
-    /**
-     * Сохранение конфига
-     */
-    public function saveConfig(array $config): void
+    public function loadConfigCurrent(): array
+    {
+        $configPath = PathService::getConfigCurrentPath();
+        return File::exists($configPath) ? json_decode(File::get($configPath), true) : [];
+    }
+    public function saveConfigFiles(array $config): void
     {
         File::put(PathService::getConfigFilePath(), json_encode($config, JSON_PRETTY_PRINT));
+    }
+    public function saveConfigCurrent(array $config): void
+    {
+        File::put(PathService::getConfigCurrentPath(), json_encode($config, JSON_PRETTY_PRINT));
     }
 
     /**
@@ -31,20 +32,30 @@ class ConfigService
     {
         $configDir = PathService::getConfigDirPath();
         $configFile = PathService::getConfigFilePath();
+        $configCurrentFile = PathService::getConfigCurrentPath();
         $parentProjectPath = PathService::getParentProjectPath();
 
         if (!File::exists($configDir)) {
             File::makeDirectory($configDir, 0755, true);
         }
+        if (!File::exists($configCurrentFile)) {
+            $data = [
+                'last_checked' => '00.00.0000 00:00',
+                'last_synced' => '00.00.0000 00:00',
+                'last_build' => '00.00.0000 00:00',
+                'current_project' => '',
+            ];
+            File::put($configCurrentFile, json_encode($data, JSON_PRETTY_PRINT));
+        }
 
         $fileTree = $this->buildFileTree($parentProjectPath);
 
         if (!File::exists($configFile)) {
-            $this->saveConfig($fileTree);
+            $this->saveConfigFiles($fileTree);
         } else {
-            $storedTree = $this->loadConfig();
+            $storedTree = $this->loadConfigFiles();
             $this->syncData($storedTree, $fileTree);
-            $this->saveConfig($storedTree);
+            $this->saveConfigFiles($storedTree);
         }
     }
 
@@ -103,7 +114,7 @@ class ConfigService
      */
     private function updateConfigItem(string $path, string $key, mixed $value): bool
     {
-        $config = $this->loadConfig();
+        $config = $this->loadConfigFiles();
         $updated = false;
 
         foreach ($config as &$item) {
@@ -115,7 +126,7 @@ class ConfigService
         }
 
         if ($updated) {
-            $this->saveConfig($config);
+            $this->saveConfigFiles($config);
         }
 
         return $updated;
@@ -142,7 +153,7 @@ class ConfigService
      */
     public function updateValidateStatus(): bool
     {
-        $config = $this->loadConfig();
+        $config = $this->loadConfigFiles();
         $updated = false;
 
         foreach ($config as &$item) {
@@ -153,7 +164,7 @@ class ConfigService
         }
 
         if ($updated) {
-            $this->saveConfig($config);
+            $this->saveConfigFiles($config);
         }
 
         return $updated;
