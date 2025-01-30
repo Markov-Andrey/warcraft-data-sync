@@ -4,14 +4,23 @@ namespace App\Services;
 
 class PathService
 {
-    protected static string $configFileName = '.files_config.json';
+    protected static string $configDirName = '.data-sync';
+    protected static string $configFileName = 'files_config.json';
 
     /**
-     * Получить имя файла конфигурации
+     * Получить путь к файлу конфигурации
      */
-    public static function getConfigFileName(): string
+    public static function getConfigFilePath(): string
     {
-        return self::$configFileName;
+        return self::getConfigDirPath() . DIRECTORY_SEPARATOR . self::$configFileName;
+    }
+
+    /**
+     * Получить путь к директории конфигурации
+     */
+    public static function getConfigDirPath(): string
+    {
+        return self::getParentProjectPath() . DIRECTORY_SEPARATOR . self::$configDirName;
     }
 
     /**
@@ -28,24 +37,5 @@ class PathService
     public static function getChildProject(): array
     {
         return config('w3x.child_projects');
-    }
-
-    /**
-     * Получить путь к файлу конфигурации
-     */
-    public static function getConfigPath(): string
-    {
-        return self::getParentProjectPath() . DIRECTORY_SEPARATOR . self::$configFileName;
-    }
-
-    /**
-     * Получить путь к файлу в дочернем проекте
-     *
-     * @param string $childProjectPath Путь к дочернему проекту
-     * @param string $itemPath Относительный путь к файлу
-     */
-    public static function getTargetPath(string $childProjectPath, string $itemPath): string
-    {
-        return rtrim($childProjectPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . ltrim($itemPath, DIRECTORY_SEPARATOR);
     }
 }

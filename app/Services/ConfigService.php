@@ -12,7 +12,7 @@ class ConfigService
      */
     public function loadConfig(): array
     {
-        $configPath = PathService::getConfigPath();
+        $configPath = PathService::getConfigFilePath();
         return File::exists($configPath) ? json_decode(File::get($configPath), true) : [];
     }
 
@@ -21,7 +21,7 @@ class ConfigService
      */
     public function saveConfig(array $config): void
     {
-        File::put(PathService::getConfigPath(), json_encode($config, JSON_PRETTY_PRINT));
+        File::put(PathService::getConfigFilePath(), json_encode($config, JSON_PRETTY_PRINT));
     }
 
     /**
@@ -29,19 +29,23 @@ class ConfigService
      */
     public function initializeConfig(): void
     {
-        $configPath = PathService::getConfigPath();
+        $configDir = PathService::getConfigDirPath();
+        $configFile = PathService::getConfigFilePath();
         $parentProjectPath = PathService::getParentProjectPath();
 
-        if (!File::exists($configPath)) {
-            $fileTree = $this->buildFileTree($parentProjectPath);
-        } else {
-            $storedTree = $this->loadConfig();
-            $fileTree = $this->buildFileTree($parentProjectPath);
-            $this->syncData($storedTree, $fileTree);
-            $fileTree = $storedTree;
+        if (!File::exists($configDir)) {
+            File::makeDirectory($configDir, 0755, true);
         }
 
-        $this->saveConfig($fileTree);
+        $fileTree = $this->buildFileTree($parentProjectPath);
+
+        if (!File::exists($configFile)) {
+            $this->saveConfig($fileTree);
+        } else {
+            $storedTree = $this->loadConfig();
+            $this->syncData($storedTree, $fileTree);
+            $this->saveConfig($storedTree);
+        }
     }
 
     /**

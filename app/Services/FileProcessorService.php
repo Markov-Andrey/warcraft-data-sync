@@ -12,7 +12,7 @@ class FileProcessorService
      */
     public static function copyChildFiles(): bool
     {
-        $configPath = PathService::getConfigPath();
+        $configPath = PathService::getConfigFilePath();
         $child_projects = PathService::getChildProject();
         $parentProjectPath = PathService::getParentProjectPath();
         $config = json_decode(File::get($configPath), true);
