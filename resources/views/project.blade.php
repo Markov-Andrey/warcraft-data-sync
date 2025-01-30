@@ -3,32 +3,31 @@
 @section('title', 'WarCraft Data Sync')
 
 @section('content')
-    <p><strong>Current Path:</strong> {{ $currentPath }}</p>
-    <p><strong>Child Projects:</strong></p>
+    <p class="page__current-path"><strong>Current Path:</strong> {{ $currentPath }}</p>
+    <p class="page__child-projects"><strong>Child Projects:</strong></p>
     @foreach($child_projects as $project)
-        <div>{{ $project['name'] }}</div>
+        <div class="page__child-project">{{ $project['name'] }}</div>
     @endforeach
 
-    <div style="display: flex; gap: 12px;">
-        <div style="margin-top: 20px;">
+    <div class="page__buttons">
+        <div class="page__button">
             <button type="submit" onclick="commitFiles()">✅ All new files checked</button>
         </div>
-        <div style="margin-top: 20px;">
+        <div class="page__button">
             <button type="submit" onclick="copyChild()">🔄 Sync to Child</button>
         </div>
     </div>
 
-    <div style="font-size: 15px">
-        <p></p>
-        <div style="display: grid; grid-template-columns: 70% 50px 150px; font-weight: bold;">
-            <div>Item</div>
-            <div>Copy</div>
-            <div>Child Project</div>
+    <div class="page__file-list">
+        <div class="page__file-list-header">
+            <div class="page__file-list-item">Item</div>
+            <div class="page__file-list-item">Copy</div>
+            <div class="page__file-list-item">Child Project</div>
         </div>
 
         @if ($currentPath !== config('w3x.parent_project'))
-            <div>
-                <a href="{{ url('/') }}?path={{ rtrim(dirname($currentPath), '/') }}" style="font-size: 25px">
+            <div class="page__link">
+                <a href="{{ url('/') }}?path={{ rtrim(dirname($currentPath), '/') }}" class="page__link-text">
                     ...
                 </a>
             </div>

@@ -1,0 +1,95 @@
+/* file-directory-row */
+.item {
+    display: grid;
+    grid-template-columns: 70% 50px 150px;
+    align-items: center;
+    border-bottom: 1px solid black;
+    transition: background-color 0.3s;
+}
+
+.item--hover {
+    background-color: #DCDCDC;
+}
+
+.item__content {
+    display: flex;
+    align-items: center;
+}
+
+.item__link, .item__text {
+    display: inline-block;
+}
+
+.item__checkbox {
+    display: flex;
+    justify-content: center;
+}
+
+.item__hidden-input,
+.item__checkbox-input {
+    width: 25px;
+    height: 25px;
+}
+
+.item__input {
+    width: 150px;
+}
+
+.item__text-input {
+    width: 100%;
+}
+
+
+/* project */
+.page {
+    font-family: Arial, sans-serif;
+}
+.page__current-path, .page__child-projects, .page__child-project {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+.page__buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+.page__button button {
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+.page__button button:hover {
+    background-color: #0056b3;
+}
+.page__file-list {
+    font-size: 15px;
+}
+.page__file-list-header {
+    display: grid;
+    grid-template-columns: 70% 50px 150px;
+    font-weight: bold;
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+}
+.page__file-list-item {
+    padding: 5px;
+}
+.page__link {
+    margin-top: 10px;
+}
+.page__link-text {
+    font-size: 25px;
+    color: #007bff;
+    text-decoration: none;
+}
+.page__link-text:hover {
+    text-decoration: underline;
+}
+.page__file-list-item--highlight {
+    color: green;
+}
