@@ -29,7 +29,7 @@ class W3xController extends Controller
         $jsonCopy = collect($this->configService->loadConfigFiles())->pluck('copy', 'path');
         $jsonCopyChild = collect($this->configService->loadConfigFiles())->pluck('copy_child', 'path');
         $jsonValid = collect($this->configService->loadConfigFiles())->pluck('validated', 'path');
-        $configInfo = collect($this->configService->loadconfigInfo());
+        $configInfo = collect($this->configService->loadConfigInfo());
 
         $items = collect(File::directories($currentPath))
             ->merge(File::files($currentPath))

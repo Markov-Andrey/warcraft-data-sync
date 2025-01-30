@@ -106,8 +106,7 @@
                 .then(data => {
                     console.log('Commit successful:', data);
                     if (data.success) {
-                        alert('Transfer complete');
-                        // location.reload();
+                        location.reload();
                     } else {
                         console.error('Error in commit:', data.message);
                     }

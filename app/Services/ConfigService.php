@@ -11,7 +11,7 @@ class ConfigService
         $configPath = PathService::getConfigFilePath();
         return File::exists($configPath) ? json_decode(File::get($configPath), true) : [];
     }
-    public function loadconfigInfo(): array
+    public function loadConfigInfo(): array
     {
         $configPath = PathService::getconfigInfoPath();
         return File::exists($configPath) ? json_decode(File::get($configPath), true) : [];
@@ -20,7 +20,7 @@ class ConfigService
     {
         File::put(PathService::getConfigFilePath(), json_encode($config, JSON_PRETTY_PRINT));
     }
-    public function saveconfigInfo(array $config): void
+    public function saveConfigInfo(array $config): void
     {
         File::put(PathService::getconfigInfoPath(), json_encode($config, JSON_PRETTY_PRINT));
     }
@@ -153,20 +153,18 @@ class ConfigService
      */
     public function updateValidateStatus(): bool
     {
-        $config = $this->loadConfigFiles();
-        $updated = false;
+        $info = $this->loadConfigInfo();
+        $files = $this->loadConfigFiles();
 
-        foreach ($config as &$item) {
-            if (!$item['validated']) {
-                $item['validated'] = true;
-                $updated = true;
-            }
+        $info['last_checked'] = date('d.m.Y H:i');
+
+        foreach ($files as &$item) {
+            $item['validated'] = true;
         }
 
-        if ($updated) {
-            $this->saveConfigFiles($config);
-        }
+        $this->saveConfigFiles($files);
+        $this->saveConfigInfo($info);
 
-        return $updated;
+        return true;
     }
 }
