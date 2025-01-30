@@ -11,8 +11,7 @@ class ConfigService
     protected string $parentProjectPath;
     public function __construct()
     {
-        $config = config('w3x');
-        $this->parentProjectPath = $config['parent_project'];
+        $this->parentProjectPath = config('w3x.parent_project');
         $this->configPath = $this->parentProjectPath . DIRECTORY_SEPARATOR . $this->configFileName;
     }
 
@@ -48,11 +47,10 @@ class ConfigService
     public function buildFileTree($directory): array
     {
         $fileTree = [];
-        $rootPath = config('w3x.parent_project');
         $directories = File::directories($directory);
         $files = File::files($directory);
         foreach ($files as $file) {
-            $relativePath = str_replace($rootPath . DIRECTORY_SEPARATOR, '', $file->getPathname());
+            $relativePath = str_replace($this->parentProjectPath . DIRECTORY_SEPARATOR, '', $file->getPathname());
             $fileTree[] = [
                 'path' => $relativePath,
                 'name' => $file->getBasename(),
@@ -63,7 +61,7 @@ class ConfigService
             ];
         }
         foreach ($directories as $dir) {
-            $relativePath = str_replace($rootPath . DIRECTORY_SEPARATOR, '', $dir);
+            $relativePath = str_replace($this->parentProjectPath . DIRECTORY_SEPARATOR, '', $dir);
             $fileTree[] = [
                 'path' => $relativePath,
                 'name' => basename($dir),
@@ -89,13 +87,6 @@ class ConfigService
 
         return [];
     }
-    /**
-     * Обновить параметр 'copy' для файла или директории в конфиге
-     *
-     * @param string $path Путь до файла или директории
-     * @param bool $copy Новый статус 'copy'
-     * @return bool Успешно ли обновлен файл
-     */
     public function updateCopyStatus(string $path, bool $copy): bool
     {
         if (!File::exists($this->configPath)) {

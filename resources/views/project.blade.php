@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Project Explorer')
+@section('title', 'WarCraft Data Sync')
 
 @section('content')
     <p><strong>Current Path:</strong> {{ $currentPath }}</p>
