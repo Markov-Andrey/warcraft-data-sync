@@ -6,82 +6,72 @@ use Illuminate\Support\Facades\File;
 
 class ConfigService
 {
-    protected string $configFileName = '.files_config.json';
-    protected string $configPath;
-    protected string $parentProjectPath;
-    public function __construct()
+
+    /**
+     * Загрузка конфига
+     */
+    public function loadConfig(): array
     {
-        $this->parentProjectPath = config('w3x.parent_project');
-        $this->configPath = $this->parentProjectPath . DIRECTORY_SEPARATOR . $this->configFileName;
+        $configPath = PathService::getConfigPath();
+        return File::exists($configPath) ? json_decode(File::get($configPath), true) : [];
     }
 
     /**
-     * Собрать конфиг и перепроверить конфиг
-     * @return void
+     * Сохранение конфига
+     */
+    public function saveConfig(array $config): void
+    {
+        File::put(PathService::getConfigPath(), json_encode($config, JSON_PRETTY_PRINT));
+    }
+
+    /**
+     * Инициализация конфигурации
      */
     public function initializeConfig(): void
     {
-        if (!File::exists($this->configPath)) {
-            $fileTree = $this->buildFileTree($this->parentProjectPath);
-            File::put($this->configPath, json_encode($fileTree, JSON_PRETTY_PRINT));
+        $configPath = PathService::getConfigPath();
+        $parentProjectPath = PathService::getParentProjectPath();
+
+        if (!File::exists($configPath)) {
+            $fileTree = $this->buildFileTree($parentProjectPath);
         } else {
-            $storedTree = json_decode(File::get($this->configPath), true);
-            $fileTree = $this->buildFileTree($this->parentProjectPath);
+            $storedTree = $this->loadConfig();
+            $fileTree = $this->buildFileTree($parentProjectPath);
             $this->syncData($storedTree, $fileTree);
-            File::put($this->configPath, json_encode($storedTree, JSON_PRETTY_PRINT));
+            $fileTree = $storedTree;
         }
+
+        $this->saveConfig($fileTree);
     }
 
     /**
-     * Синхронизация между реальной архитектуры проекта и конфигом
-     * @return void
+     * Синхронизация реальной структуры проекта с конфигом
      */
-    public function syncData(&$storedTree, $fileTree): void
+    private function syncData(array &$storedTree, array $fileTree): void
     {
         $actualPaths = array_column($fileTree, 'path');
-        $storedTree = array_filter($storedTree, function ($item) use ($actualPaths) {
-            return in_array($item['path'], $actualPaths);
-        });
-        $storedTree = array_values($storedTree);
-        $existingPaths = array_column($storedTree, 'path');
+        $storedTree = array_values(array_filter($storedTree, fn($item) => in_array($item['path'], $actualPaths)));
 
         foreach ($fileTree as $newItem) {
-            if (!in_array($newItem['path'], $existingPaths)) {
+            if (!in_array($newItem['path'], array_column($storedTree, 'path'))) {
                 $storedTree[] = $newItem;
             }
         }
     }
 
     /**
-     * Рекурсия сбора архитектуры проекта
-     * @return array
+     * Построение дерева файлов и директорий
      */
-    public function buildFileTree($directory): array
+    private function buildFileTree(string $directory): array
     {
         $fileTree = [];
-        $directories = File::directories($directory);
-        $files = File::files($directory);
-        foreach ($files as $file) {
-            $relativePath = str_replace($this->parentProjectPath . DIRECTORY_SEPARATOR, '', $file->getPathname());
-            $fileTree[] = [
-                'path' => $relativePath,
-                'name' => $file->getBasename(),
-                'type' => 'file',
-                'copy' => false,
-                'copy_child' => '',
-                'validated' => false,
-            ];
+
+        foreach (File::files($directory) as $file) {
+            $fileTree[] = $this->formatFileItem($file->getPathname(), $directory, 'file');
         }
-        foreach ($directories as $dir) {
-            $relativePath = str_replace($this->parentProjectPath . DIRECTORY_SEPARATOR, '', $dir);
-            $fileTree[] = [
-                'path' => $relativePath,
-                'name' => basename($dir),
-                'type' => 'directory',
-                'copy' => false,
-                'copy_child' => '',
-                'validated' => false,
-            ];
+
+        foreach (File::directories($directory) as $dir) {
+            $fileTree[] = $this->formatFileItem($dir, $directory, 'directory');
             $fileTree = array_merge($fileTree, $this->buildFileTree($dir));
         }
 
@@ -89,163 +79,79 @@ class ConfigService
     }
 
     /**
-     * Читатель конфиг файла
-     * @return array
+     * Форматирование элемента (файла или директории)
      */
-    public function loadConfig()
+    private function formatFileItem(string $path, string $baseDir, string $type): array
     {
-        $config = config('w3x');
-        $parentProjectPath = $config['parent_project'];
-        $configPath = $parentProjectPath . DIRECTORY_SEPARATOR . $this->configFileName;
-        if (File::exists($configPath)) {
-            $jsonContent = File::get($configPath);
-            return json_decode($jsonContent, true);
-        }
-
-        return [];
+        $dir = PathService::getParentProjectPath();
+        return [
+            'path' => str_replace($dir . DIRECTORY_SEPARATOR, '', $path),
+            'name' => basename($path),
+            'type' => $type,
+            'copy' => false,
+            'copy_child' => '',
+            'validated' => false,
+        ];
     }
 
     /**
-     * Обработчик обновления статуса - копировать
-     * @return bool
+     * Универсальный метод обновления параметров элемента конфига
+     */
+    private function updateConfigItem(string $path, string $key, mixed $value): bool
+    {
+        $config = $this->loadConfig();
+        $updated = false;
+
+        foreach ($config as &$item) {
+            if ($item['path'] === $path) {
+                $item[$key] = $value;
+                $updated = true;
+                break;
+            }
+        }
+
+        if ($updated) {
+            $this->saveConfig($config);
+        }
+
+        return $updated;
+    }
+
+    /**
+     * Обновление статуса копирования
      */
     public function updateCopyStatus(string $path, bool $copy): bool
     {
-        $config = json_decode(File::get($this->configPath), true);
-        $updated = false;
-        foreach ($config as &$item) {
-            if ($item['path'] === $path) {
-                $item['copy'] = $copy;
-                $updated = true;
-                break;
-            }
-        }
-        if ($updated) {
-            File::put($this->configPath, json_encode($config, JSON_PRETTY_PRINT));
-        }
-
-        return $updated;
+        return $this->updateConfigItem($path, 'copy', $copy);
     }
 
     /**
-     * Обработчик обновления статуса - копировать в выбранные дочерние проекты
-     * @return bool
+     * Обновление дочернего копирования
      */
     public function updateCopyChild(string $path, string $child): bool
     {
-        $config = json_decode(File::get($this->configPath), true);
-        $updated = false;
-        foreach ($config as &$item) {
-            if ($item['path'] === $path) {
-                $item['copy_child'] = $child;
-                $updated = true;
-                break;
-            }
-        }
-        if ($updated) {
-            File::put($this->configPath, json_encode($config, JSON_PRETTY_PRINT));
-        }
-
-        return $updated;
+        return $this->updateConfigItem($path, 'copy_child', $child);
     }
 
     /**
-     * Обновить в конфиге валидацию новых файлов
-     * @return bool
+     * Обновление статуса валидации новых файлов
      */
     public function updateValidateStatus(): bool
     {
-        $config = json_decode(File::get($this->configPath), true);
+        $config = $this->loadConfig();
         $updated = false;
+
         foreach ($config as &$item) {
-            if (isset($item['validated']) && $item['validated'] === false) {
+            if (!$item['validated']) {
                 $item['validated'] = true;
                 $updated = true;
             }
         }
+
         if ($updated) {
-            File::put($this->configPath, json_encode($config, JSON_PRETTY_PRINT));
-        }
-        return true;
-    }
-
-    /**
-     * Копировать файлы дочерним проектам согласно конфигу (copy,copy_child)
-     * @return bool
-     */
-    public function copyChildFiles(): bool
-    {
-        $child_projects = config('w3x.child_projects');
-        $config = json_decode(File::get($this->configPath), true);
-        $replacePatterns = include(config_path('w3x_replace.php'));
-
-        foreach ($child_projects as $project) {
-            foreach ($config as $item) {
-                if ($item['copy'] && (!$item['copy_child'] || in_array($project['name'], explode(',', $item['copy_child'])))) {
-                    $targetPath = $project['path'] . DIRECTORY_SEPARATOR . $item['path'];
-
-                    if ($item['type'] === 'directory') {
-                        if (!File::exists($targetPath)) {
-                            File::makeDirectory($targetPath, 0777, true);
-                        }
-                        $this->copyFilesRecursive($this->parentProjectPath . DIRECTORY_SEPARATOR . $item['path'], $targetPath);
-                    } elseif ($item['type'] === 'file') {
-                        $sourceFile = $this->parentProjectPath . DIRECTORY_SEPARATOR . $item['path'];
-                        if (File::exists($sourceFile)) {
-                            $targetDir = dirname($targetPath);
-                            if (!File::exists($targetDir)) {
-                                File::makeDirectory($targetDir, 0777, true);
-                            }
-                            File::copy($sourceFile, $targetPath);
-
-                            // Передаем **ВЕСЬ** $replacePatterns, а не `war3map.wts`
-                            $this->processFileWithPatterns($replacePatterns, $targetPath, $project['name']);
-                        }
-                    }
-                }
-            }
-        }
-        return true;
-    }
-    /**
-     * Обрабатываем файл в проекте с применением паттернов замены
-     */
-    private function processFileWithPatterns(array $patterns, string $filePath, string $projectName): void
-    {
-        $content = File::get($filePath);
-
-        foreach ($patterns as $file => $filePatterns) {
-            if ($file === basename($filePath)) {
-                foreach ($filePatterns as $pattern => $replacement) {
-                    if (str_contains($replacement, ':project_name')) {
-                        $replacement = str_replace(':project_name', $projectName, $replacement);
-                    }
-                    $content = preg_replace($pattern, $replacement, $content);
-                }
-            }
+            $this->saveConfig($config);
         }
 
-        File::put($filePath, $content);
-    }
-
-    /**
-     * Рекурсия, если директория показана к полному копированию
-     * @return void
-     */
-    private function copyFilesRecursive($sourceDir, $targetDir): void
-    {
-        $files = File::allFiles($sourceDir);
-
-        foreach ($files as $file) {
-            $relativePath = str_replace($sourceDir . DIRECTORY_SEPARATOR, '', $file->getRealPath());
-            $targetFile = $targetDir . DIRECTORY_SEPARATOR . $relativePath;
-
-            $targetDirPath = dirname($targetFile);
-            if (!File::exists($targetDirPath)) {
-                File::makeDirectory($targetDirPath, 0777, true);
-            }
-
-            File::copy($file->getRealPath(), $targetFile);
-        }
+        return $updated;
     }
 }

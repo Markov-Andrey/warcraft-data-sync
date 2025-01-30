@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\ConfigService;
+use App\Services\FileProcessorService;
 use Illuminate\Http\Request;
 
 class FileController extends Controller
@@ -53,7 +54,7 @@ class FileController extends Controller
     }
     public function copyChild()
     {
-        $updated = $this->configService->copyChildFiles();
+        $updated = FileProcessorService::copyChildFiles();
         if ($updated) {
             return response()->json(['success' => true]);
         } else {
