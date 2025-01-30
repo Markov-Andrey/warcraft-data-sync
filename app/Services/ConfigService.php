@@ -67,11 +67,11 @@ class ConfigService
         $fileTree = [];
 
         foreach (File::files($directory) as $file) {
-            $fileTree[] = $this->formatFileItem($file->getPathname(), $directory, 'file');
+            $fileTree[] = $this->formatFileItem($file->getPathname(), 'file');
         }
 
         foreach (File::directories($directory) as $dir) {
-            $fileTree[] = $this->formatFileItem($dir, $directory, 'directory');
+            $fileTree[] = $this->formatFileItem($dir, 'directory');
             $fileTree = array_merge($fileTree, $this->buildFileTree($dir));
         }
 
@@ -81,7 +81,7 @@ class ConfigService
     /**
      * Форматирование элемента (файла или директории)
      */
-    private function formatFileItem(string $path, string $baseDir, string $type): array
+    private function formatFileItem(string $path, string $type): array
     {
         $dir = PathService::getParentProjectPath();
         return [
