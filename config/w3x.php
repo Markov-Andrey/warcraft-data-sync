@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'parent_project' => 'C:\\Users\\User\\Documents\\Warcraft III\\Maps\\AMar\\WC3LegendsClassicBuild.w3x',
+    'parent_project' => 'C:\\Users\\User\\Documents\\Warcraft III\\Maps\\AMar\\WC3LegendsSilithus.w3x',
     'child_projects' => [
         'alterac' => [
             'name' => 'Alterac',
