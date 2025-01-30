@@ -153,17 +153,15 @@ class ConfigService
      */
     public function updateValidateStatus(): bool
     {
-        $info = $this->loadConfigInfo();
-        $files = $this->loadConfigFiles();
+        InfoConfigService::lastCheck();
 
-        $info['last_checked'] = date('d.m.Y H:i');
+        $files = $this->loadConfigFiles();
 
         foreach ($files as &$item) {
             $item['validated'] = true;
         }
 
         $this->saveConfigFiles($files);
-        $this->saveConfigInfo($info);
 
         return true;
     }

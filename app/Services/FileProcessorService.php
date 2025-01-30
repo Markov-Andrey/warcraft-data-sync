@@ -42,6 +42,8 @@ class FileProcessorService
                 }
             }
         }
+        InfoConfigService::lastSync();
+
         return true;
     }
     /**
