@@ -6,16 +6,16 @@ class PathService
 {
     protected static string $configDirName = '.data-sync';
     protected static string $configFileName = 'files_config.json';
-    protected static string $configCurrentName = 'current_config.json';
+    protected static string $configInfoName = 'info_config.json';
 
     public static function getConfigFilePath(): string
     {
         return self::getConfigDirPath() . DIRECTORY_SEPARATOR . self::$configFileName;
     }
 
-    public static function getConfigCurrentPath(): string
+    public static function getconfigInfoPath(): string
     {
-        return self::getConfigDirPath() . DIRECTORY_SEPARATOR . self::$configCurrentName;
+        return self::getConfigDirPath() . DIRECTORY_SEPARATOR . self::$configInfoName;
     }
 
     public static function getConfigDirPath(): string

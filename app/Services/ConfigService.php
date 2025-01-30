@@ -11,18 +11,18 @@ class ConfigService
         $configPath = PathService::getConfigFilePath();
         return File::exists($configPath) ? json_decode(File::get($configPath), true) : [];
     }
-    public function loadConfigCurrent(): array
+    public function loadconfigInfo(): array
     {
-        $configPath = PathService::getConfigCurrentPath();
+        $configPath = PathService::getconfigInfoPath();
         return File::exists($configPath) ? json_decode(File::get($configPath), true) : [];
     }
     public function saveConfigFiles(array $config): void
     {
         File::put(PathService::getConfigFilePath(), json_encode($config, JSON_PRETTY_PRINT));
     }
-    public function saveConfigCurrent(array $config): void
+    public function saveconfigInfo(array $config): void
     {
-        File::put(PathService::getConfigCurrentPath(), json_encode($config, JSON_PRETTY_PRINT));
+        File::put(PathService::getconfigInfoPath(), json_encode($config, JSON_PRETTY_PRINT));
     }
 
     /**
@@ -32,20 +32,20 @@ class ConfigService
     {
         $configDir = PathService::getConfigDirPath();
         $configFile = PathService::getConfigFilePath();
-        $configCurrentFile = PathService::getConfigCurrentPath();
+        $configInfoFile = PathService::getconfigInfoPath();
         $parentProjectPath = PathService::getParentProjectPath();
 
         if (!File::exists($configDir)) {
             File::makeDirectory($configDir, 0755, true);
         }
-        if (!File::exists($configCurrentFile)) {
+        if (!File::exists($configInfoFile)) {
             $data = [
                 'last_checked' => '00.00.0000 00:00',
                 'last_synced' => '00.00.0000 00:00',
                 'last_build' => '00.00.0000 00:00',
                 'current_project' => '',
             ];
-            File::put($configCurrentFile, json_encode($data, JSON_PRETTY_PRINT));
+            File::put($configInfoFile, json_encode($data, JSON_PRETTY_PRINT));
         }
 
         $fileTree = $this->buildFileTree($parentProjectPath);
