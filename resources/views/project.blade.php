@@ -35,7 +35,7 @@
             <div class="page__file-list-item">Child Project</div>
         </div>
 
-        @if ($currentPath !== config('w3x.parent_project'))
+        @if ($currentPath !== env('PARENT_PROJECT'))
             <div class="page__link">
                 <a href="{{ url('/') }}?path={{ rtrim(dirname($currentPath), '/') }}" class="page__link-text">
                     ...

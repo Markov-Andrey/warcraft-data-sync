@@ -17,8 +17,8 @@ class W3xController extends Controller
 
     public function index(Request $request)
     {
-        $config = config('w3x');
-        $parentProjectPath = $config['parent_project'];
+        $parentProjectPath = env('PARENT_PROJECT');
+        $parentChildPath = json_decode(env('CHILD_PROJECTS'), true);
         $currentPath = $request->get('path', $parentProjectPath);
 
         if (!str_starts_with($currentPath, $parentProjectPath)) {
@@ -47,7 +47,7 @@ class W3xController extends Controller
         return view('project', [
             'configInfo' => $configInfo,
             'rootPath' => $parentProjectPath,
-            'child_projects' => $config['child_projects'] ?? [],
+            'child_projects' => $parentChildPath ?? [],
             'directories' => $items['directory'] ?? [],
             'files' => $items['file'] ?? [],
             'currentPath' => $currentPath,

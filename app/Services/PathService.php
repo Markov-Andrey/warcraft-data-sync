@@ -25,11 +25,11 @@ class PathService
 
     public static function getParentProjectPath(): string
     {
-        return config('w3x.parent_project');
+        return env('PARENT_PROJECT');
     }
 
     public static function getChildProject(): array
     {
-        return config('w3x.child_projects');
+        return json_decode(env('CHILD_PROJECTS'), true);
     }
 }

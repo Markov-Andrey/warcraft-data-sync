@@ -1,18 +1,6 @@
 <?php
 
 return [
-    'parent_project' => 'C:\\Users\\User\\Documents\\Warcraft III\\Maps\\AMar\\WC3LegendsSilithus.w3x',
-    'child_projects' => [
-        'alterac' => [
-            'name' => 'Alterac',
-            'path' => 'C:\\Games\\OpenServer\\domains\\warcraft-data-sync\\storage\\app\\projects\\Alterac.w3x',
-        ],
-        'silithus' => [
-            'name' => 'Silithus',
-            'path' => 'C:\\Games\\OpenServer\\domains\\warcraft-data-sync\\storage\\app\\projects\\Silithus.w3x',
-        ],
-    ],
-    'build_output_path' => 'C:\\Games\\OpenServer\\domains\\warcraft-data-sync\\storage\\app\\builds',
     'files' => [
         'war3map.j' => ['copy' => true], // code
         'war3map.w3e' => ['copy' => false], // terrain texturing

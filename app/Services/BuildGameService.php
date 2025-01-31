@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
 
 class BuildGameService
 {
@@ -13,9 +12,9 @@ class BuildGameService
 
     public function __construct()
     {
-        $this->mpqPath = config('w3x_mpq.mpqeditor_path');
-        $this->childProjects = config('w3x.child_projects');
-        $this->buildOutputPath = config('w3x.build_output_path');
+        $this->mpqPath = env('MPQEDITOR_PATH');
+        $this->childProjects = json_decode(env('CHILD_PROJECTS'), true);
+        $this->buildOutputPath = env('BUILD_OUTPUT_PATH');
     }
 
     public function buildAll()
