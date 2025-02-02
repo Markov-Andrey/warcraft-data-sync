@@ -9,3 +9,4 @@ Route::post('/update-copy-child', [App\Http\Controllers\FileController::class, '
 Route::get('/commit', [App\Http\Controllers\FileController::class, 'updateValidateStatus']);
 Route::get('/copy-child', [App\Http\Controllers\FileController::class, 'copyChild']);
 Route::get('/set-build', [App\Http\Controllers\FileController::class, 'setBuild']);
+Route::post('/switch-project', [App\Http\Controllers\FileController::class, 'switchProject']);

@@ -71,4 +71,14 @@ class FileController extends Controller
             return response()->json(['error' => 'Path not found in config'], 404);
         }
     }
+    public function switchProject(Request $request)
+    {
+        $select = $request->input('select');
+        $updated = FileProcessorService::switch($select);
+        if ($updated) {
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['error' => 'Path not found in config'], 404);
+        }
+    }
 }

@@ -86,4 +86,8 @@ class FileProcessorService
             File::copy($file->getRealPath(), $targetFile);
         }
     }
+    public static function switch ($select)
+    {
+        // TODO ПРОДОЛЖИ ТУТ
+    }
 }

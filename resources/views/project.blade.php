@@ -6,7 +6,17 @@
     <p class="page__current-path"><strong>Current Path:</strong> {{ $currentPath }}</p>
     <div class="page__current-path">
         <div><strong>Инфо:</strong></div>
-        <div><strong>Текущий проект:</strong> {{$configInfo['current_project']}}</div>
+        <div>
+            <select name="child_project" id="child_project" onchange="handleProjectChange(this)">
+                <option value="" disabled selected>Выберите проект</option>
+                @foreach ($child_projects as $key => $project)
+                    <option value="{{ $project['name'] }}"
+                        {{ $project['name'] === $configInfo['current_project'] ? 'selected' : '' }}>
+                        {{ $project['name'] }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
         <div><strong>Последняя проверка:</strong> {{$configInfo['last_checked']}}</div>
         <div><strong>Последняя синхронизация:</strong> {{$configInfo['last_synced']}}</div>
         <div><strong>Последний билд:</strong> {{$configInfo['last_build']}}</div>
@@ -133,6 +143,31 @@
                 })
                 .catch(error => {
                     console.error('Error during build:', error);
+                });
+        }
+        function handleProjectChange(selectElement) {
+            const selectedProjectName = selectElement.options[selectElement.selectedIndex].text;
+            console.log(selectedProjectName)
+            fetch('/switch-project', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    select: selectedProjectName
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log("Switch successful");
+                        location.reload();
+                    } else {
+                        console.log("Error during switch");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error during switch:", error);
                 });
         }
         function updateParentValue(itemPath, value) {
