@@ -14,7 +14,7 @@ class ProcessMpqFiles extends Command
     public function handle()
     {
         $sourceDir = storage_path('app/projects');
-        $mpqPath = env('MPQEDITOR_PATH');
+        $mpqPath = base_path('tools/MPQEditor/MPQEditor.exe');
 
         if (!is_dir($sourceDir)) {
             $this->error("The directory '$sourceDir' does not exist.");

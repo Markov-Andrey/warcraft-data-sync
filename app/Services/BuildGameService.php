@@ -12,7 +12,7 @@ class BuildGameService
 
     public function __construct()
     {
-        $this->mpqPath = env('MPQEDITOR_PATH');
+        $this->mpqPath = base_path('tools/MPQEditor/MPQEditor.exe');
         $this->childProjects = json_decode(env('CHILD_PROJECTS'), true);
         $this->buildOutputPath = env('BUILD_OUTPUT_PATH');
     }
@@ -55,10 +55,10 @@ class BuildGameService
 
     protected function addFilesToMpq(string $projectPath, string $mpqFileName): void
     {
-        foreach (File::allFiles(dirname($projectPath)) as $file) {
-            $relativePath = str_replace(dirname($projectPath) . '/', '', $file->getPathname());
+        foreach (File::allFiles($projectPath) as $file) {
+            $relativePath = str_replace($projectPath . DIRECTORY_SEPARATOR, '', $file->getPathname());
 
-            if (!shell_exec(escapeshellcmd("$this->mpqPath add " . escapeshellarg($mpqFileName) . " " . escapeshellarg($relativePath) . " " . escapeshellarg($file->getRelativePathname())))) {
+            if (!shell_exec(escapeshellcmd("$this->mpqPath add " . escapeshellarg($mpqFileName) . " " . escapeshellarg($file->getPathname()) . " " . escapeshellarg($relativePath)))) {
                 throw new \Exception("Failed to add '$relativePath' to '$mpqFileName'.");
             }
         }
