@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class FileProcessorService
 {
@@ -86,8 +88,45 @@ class FileProcessorService
             File::copy($file->getRealPath(), $targetFile);
         }
     }
-    public static function switch ($select)
+    public static function switch($select)
     {
-        // TODO ПРОДОЛЖИ ТУТ
+        // TODO ПРОБЛЕМЫ С ПОИСКАМИ КЛЮЧЕЙ!
+        $swapFiles = config('w3x_swap');
+        $projects = json_decode(env('CHILD_PROJECTS'), true);
+        $parentProjectPath = env('TEST_PROJECT');
+
+        dd($projects, $select);
+        if (!isset($projects[$select])) {
+            return response()->json(['success' => false, 'message' => 'Проект не найден']);
+        }
+
+        dd($projects[$select]['path']);
+        $childProjectDir = dirname($projects[$select]['path']);
+
+        dd($childProjectDir);
+        foreach ($swapFiles as $file) {
+            $childFilePath = $childProjectDir . DIRECTORY_SEPARATOR . $file;
+            $parentFilePath = $parentProjectPath . DIRECTORY_SEPARATOR . $file;
+
+            if (!file_exists($childFilePath)) {
+                Log::error("Файл отсутствует: $childFilePath");
+                continue;
+            }
+
+            if (!is_writable($parentProjectPath)) {
+                Log::error("Нет прав на запись в: $parentProjectPath");
+                return response()->json(['success' => false, 'message' => "Нет прав на запись"]);
+            }
+
+            if (!copy($childFilePath, $parentFilePath)) {
+                Log::error("Ошибка копирования: $childFilePath -> $parentFilePath");
+                return response()->json(['success' => false, 'message' => "Ошибка копирования $file"]);
+            }
+
+            Log::info("Файл скопирован: $childFilePath -> $parentFilePath");
+        }
+
+
+        return response()->json(['success' => true, 'message' => 'Файлы успешно заменены']);
     }
 }

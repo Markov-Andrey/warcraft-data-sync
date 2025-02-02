@@ -161,7 +161,7 @@
                 .then(data => {
                     if (data.success) {
                         console.log("Switch successful");
-                        location.reload();
+                        // location.reload();
                     } else {
                         console.log("Error during switch");
                     }
