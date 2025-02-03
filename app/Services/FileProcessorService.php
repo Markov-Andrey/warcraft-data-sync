@@ -22,7 +22,10 @@ class FileProcessorService
 
         foreach ($child_projects as $project) {
             foreach ($config as $item) {
-                if ($item['copy'] && (!$item['copy_child'] || in_array($project['name'], explode(',', $item['copy_child'])))) {
+                $allowedProjects = array_map('trim', explode(',', $item['copy_child']));
+                $isAllowed = ($item['copy_child'] === '') || in_array($project['name'], $allowedProjects);
+
+                if ($item['copy'] && $isAllowed) {
                     $targetPath = $project['path'] . DIRECTORY_SEPARATOR . $item['path'];
 
                     if ($item['type'] === 'directory') {
@@ -48,6 +51,7 @@ class FileProcessorService
 
         return true;
     }
+
     /**
      * Обрабатываем файл в проекте с применением паттернов замены
      */
@@ -90,7 +94,7 @@ class FileProcessorService
     }
     public static function switch($select)
     {
-        $swapFiles = config('w3x_swap');
+        $swapFiles = config('w3x_const');
         $projects = json_decode(env('CHILD_PROJECTS'), true);
         $parentProjectPath = env('PARENT_PROJECT');
 

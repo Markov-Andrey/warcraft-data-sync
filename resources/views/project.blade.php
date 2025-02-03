@@ -64,7 +64,7 @@
                 $item = $directory;
                 $itemType = 'directory';
             @endphp
-            @include('partials.file-directory-row', ['item' => $item, 'itemType' => $itemType])
+            @include('partials.file-directory-row', ['item' => $item, 'itemType' => $itemType, 'constantFiles' => $constantFiles])
         @endforeach
 
         @foreach ($files as $file)
@@ -72,7 +72,7 @@
                 $item = $file;
                 $itemType = 'file';
             @endphp
-            @include('partials.file-directory-row', ['item' => $item, 'itemType' => $itemType])
+            @include('partials.file-directory-row', ['item' => $item, 'itemType' => $itemType, 'constantFiles' => $constantFiles])
         @endforeach
     </div>
 @endsection

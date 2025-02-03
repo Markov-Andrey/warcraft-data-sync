@@ -6,7 +6,7 @@ use App\Services\ConfigService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 
-class W3xController extends Controller
+class IndexPage extends Controller
 {
     protected ConfigService $configService;
 
@@ -30,6 +30,9 @@ class W3xController extends Controller
         $jsonCopyChild = collect($this->configService->loadConfigFiles())->pluck('copy_child', 'path');
         $jsonValid = collect($this->configService->loadConfigFiles())->pluck('validated', 'path');
         $configInfo = collect($this->configService->loadConfigInfo());
+        $constantFiles = collect(config('w3x_const'))
+            ->map(fn($path) => $parentProjectPath . DIRECTORY_SEPARATOR . $path)
+            ->toArray();
 
         $items = collect(File::directories($currentPath))
             ->merge(File::files($currentPath))
@@ -51,6 +54,7 @@ class W3xController extends Controller
             'directories' => $items['directory'] ?? [],
             'files' => $items['file'] ?? [],
             'currentPath' => $currentPath,
+            'constantFiles' => $constantFiles,
         ]);
     }
 }

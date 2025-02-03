@@ -6,35 +6,29 @@
     border-bottom: 1px solid black;
     transition: background-color 0.3s;
 }
-
 .item--hover {
     background-color: #DCDCDC;
 }
-
 .item__content {
     display: flex;
     align-items: center;
 }
-
 .item__link, .item__text {
     display: inline-block;
 }
-
 .item__checkbox {
     display: flex;
     justify-content: center;
 }
-
 .item__hidden-input,
 .item__checkbox-input {
+    text-align: center;
     width: 25px;
     height: 25px;
 }
-
 .item__input {
     width: 150px;
 }
-
 .item__text-input {
     width: 100%;
 }
@@ -92,4 +86,39 @@
 }
 .page__file-list-item--highlight {
     color: green;
+}
+/* Загрузчик */
+.page__button {
+    position: relative;
+    display: inline-block;
+}
+button {
+    position: relative;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+.loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: none;
+    transform: translate(-50%, -50%);
+}
+button.loading .button-text {
+    visibility: hidden;
+}
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }

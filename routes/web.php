@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\W3xController;
+use App\Http\Controllers\IndexPage;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [W3xController::class, 'index']);
+Route::get('/', [IndexPage::class, 'index']);
 Route::post('/update-copy-status', [App\Http\Controllers\FileController::class, 'updateCopyStatus']);
 Route::post('/update-copy-child', [App\Http\Controllers\FileController::class, 'updateCopyChild']);
 Route::get('/commit', [App\Http\Controllers\FileController::class, 'updateValidateStatus']);

@@ -4,6 +4,15 @@ namespace App\Services;
 
 class InfoConfigService
 {
+    public static function defaultValues(): array
+    {
+        return [
+            'last_checked' => '00.00.0000 00:00',
+            'last_synced' => '00.00.0000 00:00',
+            'last_build' => '00.00.0000 00:00',
+            'current_project' => '',
+        ];
+    }
     public static function updateTimestamp(string $key): void
     {
         $configService = new ConfigService();

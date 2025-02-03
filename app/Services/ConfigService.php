@@ -39,12 +39,7 @@ class ConfigService
             File::makeDirectory($configDir, 0755, true);
         }
         if (!File::exists($configInfoFile)) {
-            $data = [
-                'last_checked' => '00.00.0000 00:00',
-                'last_synced' => '00.00.0000 00:00',
-                'last_build' => '00.00.0000 00:00',
-                'current_project' => '',
-            ];
+            $data = InfoConfigService::defaultValues();
             File::put($configInfoFile, json_encode($data, JSON_PRETTY_PRINT));
         }
 
@@ -99,11 +94,16 @@ class ConfigService
     private function formatFileItem(string $path, string $type): array
     {
         $dir = PathService::getParentProjectPath();
+        $w3x = config('w3x_const');
+
+        $relativePath = str_replace($dir . DIRECTORY_SEPARATOR, '', $path);
+        $isCopyAllowed = !in_array($relativePath, $w3x);
+
         return [
-            'path' => str_replace($dir . DIRECTORY_SEPARATOR, '', $path),
+            'path' => $relativePath,
             'name' => basename($path),
             'type' => $type,
-            'copy' => false,
+            'copy' => $isCopyAllowed,
             'copy_child' => '',
             'validated' => false,
         ];
@@ -118,10 +118,13 @@ class ConfigService
         $updated = false;
 
         foreach ($config as &$item) {
-            if ($item['path'] === $path) {
+            if (str_starts_with($item['path'], $path)) {
                 $item[$key] = $value;
                 $updated = true;
-                break;
+            }
+            if (!$updated && $item['path'] === $path) {
+                $item[$key] = $value;
+                $updated = true;
             }
         }
 
