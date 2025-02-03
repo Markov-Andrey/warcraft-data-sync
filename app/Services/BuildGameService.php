@@ -41,7 +41,12 @@ class BuildGameService
         }
 
         $projectName = basename($projectPath, '.w3x');
-        $mpqFileName = "{$this->buildOutputPath}/{$projectName}.w3x";
+        $version = InfoConfigService::load('build_version');
+        if ($version) {
+            $mpqFileName = "{$this->buildOutputPath}/{$projectName}-{$version}.w3x";
+        } else {
+            $mpqFileName = "{$this->buildOutputPath}/{$projectName}.w3x";
+        }
 
         if (!shell_exec(escapeshellcmd("$this->mpqPath new " . escapeshellarg($mpqFileName)))) {
             throw new \Exception("Failed to create MPQ file '$mpqFileName'.");

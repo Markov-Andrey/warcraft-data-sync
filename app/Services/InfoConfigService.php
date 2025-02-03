@@ -15,7 +15,13 @@ class InfoConfigService
         ];
     }
 
-    private static function updateConfigValue(string $key, mixed $value): void
+    public static function load($key): ?string
+    {
+        $data = (new ConfigService)->loadConfigInfo();
+        return $data[$key] ?? null;
+    }
+
+    private static function save(string $key, mixed $value): void
     {
         $configService = new ConfigService();
         $info = $configService->loadConfigInfo();
@@ -25,26 +31,26 @@ class InfoConfigService
 
     public static function lastSync(): void
     {
-        self::updateConfigValue('last_synced', date('d.m.Y H:i'));
+        self::save('last_synced', date('d.m.Y H:i'));
     }
 
     public static function lastCheck(): void
     {
-        self::updateConfigValue('last_checked', date('d.m.Y H:i'));
+        self::save('last_checked', date('d.m.Y H:i'));
     }
 
     public static function lastBuild(): void
     {
-        self::updateConfigValue('last_build', date('d.m.Y H:i'));
+        self::save('last_build', date('d.m.Y H:i'));
     }
 
     public static function selectedProject($project): void
     {
-        self::updateConfigValue('current_project', $project);
+        self::save('current_project', $project);
     }
 
     public static function selectedVersion($str): void
     {
-        self::updateConfigValue('build_version', $str);
+        self::save('build_version', $str);
     }
 }
