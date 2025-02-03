@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\BuildGameService;
 use App\Services\ConfigService;
 use App\Services\FileProcessorService;
+use App\Services\InfoConfigService;
 use Illuminate\Http\Request;
 
 class FileController extends Controller
@@ -80,5 +81,12 @@ class FileController extends Controller
         } else {
             return response()->json(['error' => 'Path not found in config'], 404);
         }
+    }
+    public function setVersion(Request $request)
+    {
+        $version = $request->input('version');
+        InfoConfigService::selectedVersion($version);
+
+        return response()->json(['success' => true]);
     }
 }

@@ -21,6 +21,9 @@
         <div><strong>Last checked:</strong> {{$configInfo['last_checked']}}</div>
         <div><strong>Last sync:</strong> {{$configInfo['last_synced']}}</div>
         <div><strong>Last build:</strong> {{$configInfo['last_build']}}</div>
+        <div><strong>Last version:</strong>
+            <input type="text" value="{{$configInfo['build_version']}}" onchange="handleBuildChange(this)">
+        </div>
     </div>
     <p class="page__child-projects"><strong>Child Projects:</strong></p>
     @foreach($child_projects as $key => $project)
@@ -173,6 +176,30 @@
                 })
                 .catch(error => {
                     console.error("Error during switch:", error);
+                });
+        }
+        function handleBuildChange(text) {
+            const version = text.value;
+            fetch('/update-version', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    version: version
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log("Version successful");
+                        location.reload();
+                    } else {
+                        console.log("Error during version");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error during version:", error);
                 });
         }
         function updateParentValue(itemPath, value) {

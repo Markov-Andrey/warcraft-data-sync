@@ -120,7 +120,6 @@ class FileProcessorService
         }
         InfoConfigService::selectedProject($select);
 
-
         return response()->json(['success' => true, 'message' => 'Файлы успешно заменены']);
     }
 }
