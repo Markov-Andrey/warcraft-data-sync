@@ -1,60 +1,132 @@
-# 🌟 WarCraft Data Sync — Русская версия
+# WarCraft Data Sync
 
-## 📄 Описание
+**WarCraft Data Sync** — это система для переноса данных от родительского проекта к зависимым проектам. Она анализирует файловую структуру и позволяет настраивать, какие файлы и директории должны быть скопированы, а какие нет. Также система позволяет:
 
-**WarCraft Data Sync** — это субпроект для **WarCraft Legends**, также применимый для других проектов на платформе **WarCraft Reforged**, использующих систему каталогов. Основная задача проекта заключается в автоматическом переносе данных из главного проекта (далее — донор) в зависимые проекты (далее — реципиенты) с помощью одной команды Artisan. После переноса данных происходит очистка от технических тегов, указанных в конфигурационном файле `wts.php`.
-
-## 🚀 Основная функциональность
-
-1. **Синхронизация данных** из донора в несколько реципиентов.
-2. **Удаление технических тегов** из файлов после копирования на основе конфигурации.
-3. **Управление процессом копирования** через конфигурационные файлы:
-    - **`w3x.php`** — описание файлов для копирования (название, описание, необходимость копирования).
-
-## 📁 Структура проекта
-
-- **/config/w3x.php** — список файлов для копирования: название, описание, необходимость переноса.
-- **/storage/app/donor** — директория-источник с файлами донора.
-- **/storage/app/projects/xxx.w3x** — директории реципиентов для копирования файлов и удаления тегов.
-
-## ⚙️ Использование
-
-1. Определите файлы для копирования в `/config/w3x.php`.
-2. Паттерн удаления тегов - `[text]+many space`, например `[Thrall] `. Внимание, тег указывается в начале строки!
-3. Запустите команду:
-
-   ```bash
-   php artisan build
-Файлы будут автоматически скопированы в реципиентов, а технические теги удалены.
+- Указывать файлы и директории, уникальные для зависимого проекта.
+- Очищать технические теги в файле `war3map.wts`.
+- Вносить изменения в файл `war3map.j` согласно заданному паттерну.
+- Собрать дочерние проекты в архив формата `.w3x`, который включает все изменения и версии.
+- Переносить карту дочернего проекта в родительский.
 
 ---
 
-# 🌟 WarCraft Data Sync — English Version
+## Стек технологий
 
-## 📄 Description
+- **Backend**: Laravel 8.x
+- **Frontend**: Blade, Vue.js (если используется)
+- **PHP**: 8.1
+- **Без базы данных**: Использует файловую структуру и директорию `.data-sync` для хранения всех данных и метаданных.
+- **Архивы**: `.w3x` — формат архива для сборки финальных паков.
 
-**WarCraft Data Sync** is a subproject for **WarCraft Legends**, also applicable to other projects on the **WarCraft Reforged** platform that use a directory system. The main task of the project is to automatically transfer data from the main project (hereinafter referred to as the donor) to dependent projects (hereinafter referred to as recipients) using a single Artisan command. After the data is transferred, technical tags specified in the `wts.php` configuration file are removed.
+---
 
-## 🚀 Key Features
+## Установка
 
-- Data synchronization from the donor to multiple recipients.
-- Technical tag removal from files after copying, based on the configuration.
-- Process management via configuration files:
-    - **`w3x.php`** — file details for copying (name, description, need for copying).
+1. Клонируйте репозиторий:
 
-## 📁 Project Structure
+    ```bash
+    git clone https://github.com/Markov-Andrey/warcraft-data-sync.git
+    cd warcraft-data-sync
+    ```
 
-- **/config/w3x.php** — list of files to copy: name, description, copy necessity.
-- **/storage/app/donor** — source directory containing donor files.
-- **/storage/app/projects/xxx.w3x** — recipient directories for copying files and tag removal.
+2. Установите зависимости:
 
-## ⚙️ Usage
+    ```bash
+    composer install
+    ```
 
-1. Define the files to be copied in `/config/w3x.php`.
-2. The pattern for removing tags is `[text] + many spaces`, for example, `[Thrall] `. Note that the tag is specified at the beginning of the line!
-3. Run the command:
+3. Скопируйте файл `.env.example` в `.env` и настройте пути к родительским и дочерним проектам:
 
-   ```bash
-   php artisan build
+    ```bash
+    cp .env.example .env
+    ```
 
-Files will be automatically copied to recipients, and technical tags will be removed.
+4. Настройте переменные в `.env`, включая пути к родительскому проекту и сборке для дочерних проектов.
+
+   Пример:
+
+    ```ini
+    PARENT_PROJECT_PATH=/path/to/parent/project
+    CHILD_PROJECTS_PATH=/path/to/child/projects
+    BUILD_PATH=/path/to/build/output
+    ```
+
+---
+
+## Конфигурация
+
+Проект использует несколько конфигурационных файлов для настройки работы:
+
+### `.env`
+
+В этом файле указаны все основные переменные для пути к родительскому проекту и директории для сборки дочерних проектов:
+
+- `PARENT_PROJECT_PATH`: Путь к родительскому проекту.
+- `CHILD_PROJECTS_PATH`: Путь к директориям дочерних проектов.
+- `BUILD_PATH`: Путь для сохранения собранных билдов.
+
+### `config/w3x_const.php`
+
+Этот файл содержит константы, которые управляют блокировкой копирования файлов и указанием файлов, которые должны копироваться в родительский проект при свиче.
+
+### `config/w3x_replace.php`
+
+Этот файл содержит правила автозамены для проекта. В нем задаются паттерны для замены текста или строк в файлах, а также на что эти паттерны заменяются.
+
+---
+
+## Веб-интерфейс
+
+Проект включает веб-интерфейс на основе **Laravel** и **Blade**. Интерфейс позволяет:
+
+- **Switch**: Параметр "Current Project" используется для выполнения свича между различными дочерними проектами.
+- **Versioning**: Параметр "Build Version" добавляет постфикс версии в собранный архив (например, `<title>-<version>.w3x`).
+
+---
+
+## Запуск сервера
+
+1. Убедитесь, что у вас установлен **PHP 8.1**.
+2. Запустите сервер:
+
+    ```bash
+    php artisan serve
+    ```
+
+Сервер будет доступен по адресу `http://localhost:8000`.
+
+---
+
+## Описание работы
+
+**WarCraft Data Sync** выполняет несколько операций для каждого дочернего проекта:
+
+1. **Анализ файловой структуры**: Система анализирует файлы и директории в проекте, используя конфигурацию из `.env` и `config/w3x_const.php`.
+2. **Фильтрация файлов**: Определяет, какие файлы должны быть скопированы в зависимости от настроек.
+3. **Автозамена**: Применяет автозамены в соответствии с правилами из `config/w3x_replace.php`.
+4. **Очищение тегов**: Очищает технические теги из файла `war3map.wts`, если это предусмотрено.
+5. **Свич**: Параметр "Current Project" позволяет переключаться между дочерними проектами.
+6. **Сборка архива**: Все изменения собираются в архив `.w3x`, который включает все необходимые файлы и изменения.
+
+---
+
+## Пример использования
+
+1. Укажите в `.env` пути к родительскому проекту и дочерним проектам.
+2. Настройте параметры в веб-интерфейсе:
+    - Выберите родительский проект.
+    - Выберите дочерний проект.
+    - Укажите версию билда.
+3. Нажмите **"Собрать"** для создания архива `.w3x` с нужной версией.
+
+---
+
+## Важные файлы и директории
+
+- **.data-sync**: Директория, которая выполняет роль базы данных. Хранит все метаданные о последней операции, а также архитектуру файлов.
+- **.env**: Конфигурационный файл, где задаются пути к проектам и другие переменные.
+- **config/w3x_const.php**: Файл с константами для настройки блокировки копирования.
+- **config/w3x_replace.php**: Файл для автозамены в проекте.
+
+---
+

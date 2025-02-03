@@ -21,7 +21,7 @@
         <div><strong>Last checked:</strong> {{$configInfo['last_checked']}}</div>
         <div><strong>Last sync:</strong> {{$configInfo['last_synced']}}</div>
         <div><strong>Last build:</strong> {{$configInfo['last_build']}}</div>
-        <div><strong>Last version:</strong>
+        <div><strong>Build version:</strong>
             <input type="text" value="{{$configInfo['build_version']}}" onchange="handleBuildChange(this)">
         </div>
     </div>
