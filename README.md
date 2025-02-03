@@ -80,7 +80,7 @@ This file contains replacement rules for the project. It defines patterns for re
 The project includes a web interface built with **Laravel** and **Blade**. The interface allows you to:
 
 - **Switch**: The "Current Project" setting is used for switching between different child projects.
-- **Versioning**: The "Build Version" setting adds a version suffix to the built archive (e.g., `<title>-<version>.w3x`).
+- **Versions**: The "Build Version" setting adds a version suffix to the built archive (e.g., `<title>-<version>.w3x`).
 
 ---
 
@@ -212,7 +212,7 @@ The server will be available at `http://localhost:8000`.
 Проект включает веб-интерфейс на основе **Laravel** и **Blade**. Интерфейс позволяет:
 
 - **Switch**: Параметр "Current Project" используется для выполнения свича между различными дочерними проектами.
-- **Versioning**: Параметр "Build Version" добавляет постфикс версии в собранный архив (например, `<title>-<version>.w3x`).
+- **Versions**: Параметр "Build Version" добавляет постфикс версии в собранный архив (например, `<title>-<version>.w3x`).
 
 ---
 
