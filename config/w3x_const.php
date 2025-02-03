@@ -12,4 +12,5 @@ return [
     'war3map.w3c', // Camera parameters
     'war3map.w3r', // Info by regions
     'war3map.w3s', // Sounds are set
+    'FullScreen.blp', // Map preview screen
 ];
