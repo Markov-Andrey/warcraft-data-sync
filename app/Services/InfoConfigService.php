@@ -26,4 +26,12 @@ class InfoConfigService
     {
         self::updateTimestamp('last_build');
     }
+
+    public static function selectedProject($project): void
+    {
+        $configService = new ConfigService();
+        $info = $configService->loadConfigInfo();
+        $info['current_project'] = $project;
+        $configService->saveConfigInfo($info);
+    }
 }

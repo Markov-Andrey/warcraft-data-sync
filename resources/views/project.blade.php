@@ -7,11 +7,12 @@
     <div class="page__current-path">
         <div><strong>Инфо:</strong></div>
         <div>
+            <strong>Текущий проект:</strong>
             <select name="child_project" id="child_project" onchange="handleProjectChange(this)">
-                <option value="" disabled selected>Выберите проект</option>
+                <option value="" disabled selected>-</option>
                 @foreach ($child_projects as $key => $project)
-                    <option value="{{ $project['name'] }}"
-                        {{ $project['name'] === $configInfo['current_project'] ? 'selected' : '' }}>
+                    <option value="{{ $key }}"
+                        {{ $key === $configInfo['current_project'] ? 'selected' : '' }}>
                         {{ $project['name'] }}
                     </option>
                 @endforeach
@@ -22,8 +23,13 @@
         <div><strong>Последний билд:</strong> {{$configInfo['last_build']}}</div>
     </div>
     <p class="page__child-projects"><strong>Child Projects:</strong></p>
-    @foreach($child_projects as $project)
-        <div class="page__child-project">{{ $project['name'] }}</div>
+    @foreach($child_projects as $key => $project)
+        <div class="page__child-project">
+            @if($key == $configInfo['current_project'])
+                ✅
+            @endif
+            {{ $project['name'] }}
+        </div>
     @endforeach
 
     <div class="page__buttons">
@@ -146,22 +152,21 @@
                 });
         }
         function handleProjectChange(selectElement) {
-            const selectedProjectName = selectElement.options[selectElement.selectedIndex].text;
-            console.log(selectedProjectName)
+            const selectedProjectKey = selectElement.value;
             fetch('/switch-project', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    select: selectedProjectName
+                    select: selectedProjectKey
                 })
             })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         console.log("Switch successful");
-                        // location.reload();
+                        location.reload();
                     } else {
                         console.log("Error during switch");
                     }
