@@ -5,9 +5,9 @@
 @section('content')
     <p class="page__current-path"><strong>Current Path:</strong> {{ $currentPath }}</p>
     <div class="page__current-path">
-        <div><strong>Инфо:</strong></div>
+        <div><strong>Info:</strong></div>
         <div>
-            <strong>Текущий проект:</strong>
+            <strong>Current project:</strong>
             <select name="child_project" id="child_project" onchange="handleProjectChange(this)">
                 <option value="" disabled selected>-</option>
                 @foreach ($child_projects as $key => $project)
@@ -18,9 +18,9 @@
                 @endforeach
             </select>
         </div>
-        <div><strong>Последняя проверка:</strong> {{$configInfo['last_checked']}}</div>
-        <div><strong>Последняя синхронизация:</strong> {{$configInfo['last_synced']}}</div>
-        <div><strong>Последний билд:</strong> {{$configInfo['last_build']}}</div>
+        <div><strong>Last checked:</strong> {{$configInfo['last_checked']}}</div>
+        <div><strong>Last sync:</strong> {{$configInfo['last_synced']}}</div>
+        <div><strong>Last build:</strong> {{$configInfo['last_build']}}</div>
     </div>
     <p class="page__child-projects"><strong>Child Projects:</strong></p>
     @foreach($child_projects as $key => $project)
