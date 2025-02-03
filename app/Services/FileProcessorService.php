@@ -20,7 +20,7 @@ class FileProcessorService
         $config = json_decode(File::get($configPath), true);
         $replacePatterns = include(config_path('w3x_replace.php'));
 
-        foreach ($child_projects as $project) {
+        foreach ($child_projects as $key => $project) {
             foreach ($config as $item) {
                 $allowedProjects = array_map('trim', explode(',', $item['copy_child']));
                 $isAllowed = ($item['copy_child'] === '') || in_array($project['name'], $allowedProjects);
@@ -41,7 +41,7 @@ class FileProcessorService
                                 File::makeDirectory($targetDir, 0777, true);
                             }
                             File::copy($sourceFile, $targetPath);
-                            FileProcessorService::processFileWithPatterns($replacePatterns, $targetPath, $project['name']);
+                            FileProcessorService::processFileWithPatterns($replacePatterns, $targetPath, $key);
                         }
                     }
                 }
@@ -55,15 +55,15 @@ class FileProcessorService
     /**
      * Обрабатываем файл в проекте с применением паттернов замены
      */
-    public static function processFileWithPatterns(array $patterns, string $filePath, string $projectName): void
+    public static function processFileWithPatterns(array $patterns, string $filePath, string $projectKey): void
     {
         $content = File::get($filePath);
 
         foreach ($patterns as $file => $filePatterns) {
             if ($file === basename($filePath)) {
                 foreach ($filePatterns as $pattern => $replacement) {
-                    if (str_contains($replacement, ':project_name')) {
-                        $replacement = str_replace(':project_name', $projectName, $replacement);
+                    if (str_contains($replacement, ':project_key')) {
+                        $replacement = str_replace(':project_key', $projectKey, $replacement);
                     }
                     $content = preg_replace($pattern, $replacement, $content);
                 }
