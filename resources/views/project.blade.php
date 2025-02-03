@@ -31,7 +31,7 @@
             @if($key == $configInfo['current_project'])
                 ✅
             @endif
-            {{ $project['name'] }}
+            {{ $project['name'] }} ({{$key}})
         </div>
     @endforeach
 
