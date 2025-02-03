@@ -13,7 +13,7 @@
 ## Tech Stack
 
 - **Backend**: Laravel 8.x
-- **Frontend**: Blade, Vue.js (if used)
+- **Frontend**: Blade
 - **PHP**: 8.1
 - **No Database**: Uses file structure and `.data-sync` directory to store all data and metadata.
 - **Archives**: `.w3x` — the archive format for building final packs.
@@ -145,7 +145,7 @@ The server will be available at `http://localhost:8000`.
 ## Стек технологий
 
 - **Backend**: Laravel 8.x
-- **Frontend**: Blade, Vue.js (если используется)
+- **Frontend**: Blade
 - **PHP**: 8.1
 - **Без базы данных**: Использует файловую структуру и директорию `.data-sync` для хранения всех данных и метаданных.
 - **Архивы**: `.w3x` — формат архива для сборки финальных паков.
