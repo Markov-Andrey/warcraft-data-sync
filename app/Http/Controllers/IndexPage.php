@@ -29,6 +29,7 @@ class IndexPage extends Controller
         $jsonCopy = collect($this->configService->loadConfigFiles())->pluck('copy', 'path');
         $jsonCopyChild = collect($this->configService->loadConfigFiles())->pluck('copy_child', 'path');
         $jsonValid = collect($this->configService->loadConfigFiles())->pluck('validated', 'path');
+        $countNewFiles = $jsonValid->filter(fn($validated) => $validated === false)->count();
         $configInfo = collect($this->configService->loadConfigInfo());
         $constantFiles = collect(config('w3x_const'))
             ->map(fn($path) => $parentProjectPath . DIRECTORY_SEPARATOR . $path)
@@ -55,6 +56,7 @@ class IndexPage extends Controller
             'files' => $items['file'] ?? [],
             'currentPath' => $currentPath,
             'constantFiles' => $constantFiles,
+            'countNewFiles' => $countNewFiles ?? null,
         ]);
     }
 }

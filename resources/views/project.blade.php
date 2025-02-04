@@ -37,7 +37,7 @@
 
     <div class="page__buttons">
         <div class="page__button">
-            <button type="submit" onclick="commitFiles()">✅ All new files checked</button>
+            <button type="submit" onclick="commitFiles()">✅ All new files checked @if($countNewFiles) <div class="page__button__circle">{{ $countNewFiles }}</div> @endif</button>
         </div>
         <div class="page__button">
             <button type="submit" onclick="copyChild()">🔄 Sync to Child</button>

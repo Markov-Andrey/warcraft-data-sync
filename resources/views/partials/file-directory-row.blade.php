@@ -9,9 +9,25 @@
                 📂 {{ $item['name'] }}
             </a>
         @else
-            <div class="item__text" style="color: {{ $item['validated'] ? 'black' : 'green' }};">
-                📄 {{ $item['name'] }}
-            </div>
+            @switch(pathinfo($item['name'], PATHINFO_EXTENSION))
+                @case('mdx')
+                    <div class="item__text" style="color: {{ $item['validated'] ? 'black' : 'green' }};">
+                        📦 {{ $item['name'] }}
+                    </div>
+                    @break
+
+                @case('blp')
+                @case('dds')
+                    <div class="item__text" style="color: {{ $item['validated'] ? 'black' : 'green' }};">
+                        🔲 {{ $item['name'] }}
+                    </div>
+                    @break
+
+                @default
+                    <div class="item__text" style="color: {{ $item['validated'] ? 'black' : 'green' }};">
+                        📄 {{ $item['name'] }}
+                    </div>
+            @endswitch
         @endif
     </div>
 
