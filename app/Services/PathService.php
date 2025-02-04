@@ -8,6 +8,10 @@ class PathService
     protected static string $configFileName = 'files_config.json';
     protected static string $configInfoName = 'info_config.json';
 
+    public static function getProjectPath()
+    {
+        return env('PROJECT');
+    }
     public static function getConfigFilePath(): string
     {
         return self::getConfigDirPath() . DIRECTORY_SEPARATOR . self::$configFileName;

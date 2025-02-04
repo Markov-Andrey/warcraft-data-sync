@@ -4,36 +4,53 @@
 
 @section('content')
     <p class="page__current-path"><strong>Current Path:</strong> {{ $currentPath }}</p>
-    <div class="page__current-path">
-        <div><strong>Info:</strong></div>
+    <div class="flex">
         <div>
-            <strong>Current project:</strong>
-            <select name="child_project" id="child_project" onchange="handleProjectChange(this)">
-                <option value="" disabled selected>-</option>
-                @foreach ($child_projects as $key => $project)
-                    <option value="{{ $key }}"
-                        {{ $key === $configInfo['current_project'] ? 'selected' : '' }}>
-                        {{ $project['name'] }}
-                    </option>
-                @endforeach
-            </select>
+            <div class="page__current-path">
+                <div><strong>Info:</strong></div>
+                <div>
+                    <strong>Current project:</strong>
+                    <select name="child_project" id="child_project" onchange="handleProjectChange(this)">
+                        <option value="" disabled selected>-</option>
+                        @foreach ($child_projects as $key => $project)
+                            <option value="{{ $key }}"
+                                {{ $key === $configInfo['current_project'] ? 'selected' : '' }}>
+                                {{ $project['name'] }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div><strong>Last checked:</strong> {{$configInfo['last_checked']}}</div>
+                <div><strong>Last sync:</strong> {{$configInfo['last_synced']}}</div>
+                <div><strong>Last build:</strong> {{$configInfo['last_build']}}</div>
+                <div><strong>Build version:</strong>
+                    <input type="text" value="{{$configInfo['build_version']}}" onchange="handleBuildChange(this)">
+                </div>
+            </div>
         </div>
-        <div><strong>Last checked:</strong> {{$configInfo['last_checked']}}</div>
-        <div><strong>Last sync:</strong> {{$configInfo['last_synced']}}</div>
-        <div><strong>Last build:</strong> {{$configInfo['last_build']}}</div>
-        <div><strong>Build version:</strong>
-            <input type="text" value="{{$configInfo['build_version']}}" onchange="handleBuildChange(this)">
+        <div>
+            <p class="page__child-projects"><strong>Child Projects:</strong></p>
+            @foreach($child_projects as $key => $project)
+                <div class="page__child-project">
+                    @if($key == $configInfo['current_project'])
+                        ✅
+                    @endif
+                    {{ $project['name'] }} ({{$key}})
+                </div>
+            @endforeach
+        </div>
+        <div>
+            <div>
+                <label for="commit_message">Commit text:</label>
+            </div>
+            <div>
+                <input type="text" id="commit_message" name="commit_message" required placeholder="message">
+            </div>
+            <div class="page__button">
+                <button type="submit" onclick="setCommit()">🚀 Git Commit & Push</button>
+            </div>
         </div>
     </div>
-    <p class="page__child-projects"><strong>Child Projects:</strong></p>
-    @foreach($child_projects as $key => $project)
-        <div class="page__child-project">
-            @if($key == $configInfo['current_project'])
-                ✅
-            @endif
-            {{ $project['name'] }} ({{$key}})
-        </div>
-    @endforeach
 
     <div class="page__buttons">
         <div class="page__button">
@@ -218,6 +235,31 @@
                 .then(data => {
                     if (data.success) {
                         console.log("Commit successful");
+                    } else {
+                        console.log("Error during commit");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error during commit:", error);
+                });
+        }
+        function setCommit() {
+            const commitMessage = document.getElementById('commit_message').value;
+
+            fetch('/commit-git', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    commit_message: commitMessage
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log("Commit successful");
+                        location.reload();
                     } else {
                         console.log("Error during commit");
                     }

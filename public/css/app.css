@@ -33,6 +33,11 @@
     width: 100%;
 }
 
+.flex {
+    display: flex;
+    gap: 12px;
+}
+
 
 /* project */
 .page {
