@@ -3,10 +3,14 @@
 @section('title', 'WarCraft Data Sync')
 
 @section('content')
-    <div>
-        <a href="/units">Clear</a>
+    <div class="page__button">
+        <button>
+            <a href="/units">Clear</a>
+        </button>
         @foreach($tags as $tag)
-            <a href="?legends={{ urlencode(strtolower($tag)) }}">{{ $tag }}</a>
+            <button>
+                <a href="?legends={{ urlencode(strtolower($tag)) }}">{{ $tag }}</a>
+            </button>
         @endforeach
     </div>
     <div class="container">
