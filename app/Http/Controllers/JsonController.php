@@ -11,7 +11,7 @@ class JsonController extends Controller
 {
     public function units(Request $request)
     {
-        $path = PathService::getProjectPath();
+        $path = PathService::getParentProjectPath();
         $w3u = $path . '\war3map.w3u';
         $w3uSkin = $path . '\war3mapSkin.w3u';
         $wts = $path . '\war3map.wts';
@@ -19,13 +19,13 @@ class JsonController extends Controller
         $w3uSkinJson = $w3uSkin . '.json';
         $wtsJson = $wts . '.json';
         if (MapConverterService::shouldConvert($w3u, $w3uJson)) {
-            MapConverterService::convertToJson($w3u, $w3uJson);
+            MapConverterService::convertToJson($w3u, $w3u);
         }
         if (MapConverterService::shouldConvert($w3uSkin, $w3uSkinJson)) {
-            MapConverterService::convertToJson($w3uSkin, $w3uSkinJson);
+            MapConverterService::convertToJson($w3uSkin, $w3uSkin);
         }
         if (MapConverterService::shouldConvert($wts, $wtsJson)) {
-            MapConverterService::convertToJson($wts, $wtsJson);
+            MapConverterService::convertToJson($wts, $wts);
         }
 
         $jsonDataW3u = json_decode(file_get_contents($w3uJson), true);
