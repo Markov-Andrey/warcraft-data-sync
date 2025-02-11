@@ -3,6 +3,12 @@
 @section('title', 'WarCraft Data Sync')
 
 @section('content')
+    <div>
+        <a href="/units">Clear</a>
+        @foreach($tags as $tag)
+            <a href="?legends={{ urlencode(strtolower($tag)) }}">{{ $tag }}</a>
+        @endforeach
+    </div>
     <div class="container">
         <table class="table table-bordered table-striped" style="border-collapse: collapse; width: 100%;">
             <thead class="table-dark">
