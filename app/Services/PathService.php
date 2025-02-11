@@ -29,7 +29,7 @@ class PathService
 
     public static function getParentProjectPath(): string
     {
-        return env('PARENT_PROJECT');
+        return env('PROJECT');
     }
 
     public static function getChildProject(): array
