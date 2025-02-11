@@ -36,7 +36,7 @@ class JsonController extends Controller
         $unitsW3uSkin = array_merge($jsonDataW3uSkin['original'] ?? [], $jsonDataW3uSkin['custom'] ?? []);
         $allUnits = array_merge_recursive($unitsW3u, $unitsW3uSkin);
 
-        $tags = ['Arthas', 'Uther', 'Tyrande', 'Wrynn', 'Whitemane'];
+        $tags = JsonService::mapTags();
 
         $wtsMapping = $jsonDataWts ?? [];
 

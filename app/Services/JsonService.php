@@ -52,4 +52,9 @@ class JsonService
 
         return $filteredUnits;
     }
+
+    public static function mapTags()
+    {
+        return ['Arthas', 'Uther', 'Tyrande', 'Wrynn', 'Whitemane', 'Alterac', 'Silithus'];
+    }
 }
