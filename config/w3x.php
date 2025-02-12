@@ -10,7 +10,7 @@ return [
     'war3map.doo' => ['copy' => false], // info about trees
     'war3mapUnits.doo'    => ['copy' => false], // information about all objects placed on map
     'war3map.w3i' => ['copy' => false], // Various information about the map, which is set in the editor in the scenario section
-    'war3map.wts' => ['copy' => true], // String values (GUI)
+    'war3map.wts' => ['copy' => true], // String values (TRIGSTR)
     'war3mapMap.blp' => ['copy' => false], // Minimap
     'war3map.mmp' => ['copy' => false], // Minimap icons during initialization
     'war3map.w3u' => ['copy' => true], // Units - Objects
