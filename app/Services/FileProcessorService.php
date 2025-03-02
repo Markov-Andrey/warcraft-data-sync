@@ -62,15 +62,16 @@ class FileProcessorService
         foreach ($patterns as $file => $filePatterns) {
             if ($file === basename($filePath)) {
                 foreach ($filePatterns as $pattern => $replacement) {
-                    $replacement = str_replace(
-                        [':project_name', ':project_key', ':project_description'],
-                        [$name, $projectKey, $description],
-                        $replacement
-                    );
-                    $newContent = preg_replace($pattern, $replacement, $content);
-                    if ($newContent !== null) {
-                        $content = $newContent;
+                    if (str_contains($replacement, ':project_name')) {
+                        $replacement = str_replace(':project_name', $name, $replacement);
                     }
+                    if (str_contains($replacement, ':project_key')) {
+                        $replacement = str_replace(':project_key', $projectKey, $replacement);
+                    }
+                    if (str_contains($replacement, ':description')) {
+                        $replacement = str_replace(':description', $description, $replacement);
+                    }
+                    $content = preg_replace($pattern, $replacement, $content);
                 }
             }
         }
