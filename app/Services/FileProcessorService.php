@@ -41,7 +41,7 @@ class FileProcessorService
                                 File::makeDirectory($targetDir, 0777, true);
                             }
                             File::copy($sourceFile, $targetPath);
-                            FileProcessorService::processFileWithPatterns($replacePatterns, $targetPath, $key, $project['name'], $project['description']);
+                            FileProcessorService::processFileWithPatterns($replacePatterns, $targetPath, $project);
                         }
                     }
                 }
@@ -55,21 +55,24 @@ class FileProcessorService
     /**
      * Обрабатываем файл в проекте с применением паттернов замены
      */
-    public static function processFileWithPatterns(array $patterns, string $filePath, string $projectKey, string $name, string $description): void
+    public static function processFileWithPatterns(array $patterns, string $filePath, array $project): void
     {
         $content = File::get($filePath);
+
+        $replacements = [
+            ':project_name' => $project['name'],
+            ':project_key' => $project['key'],
+            ':description' => $project['description'],
+            ':type_game' => $project['type_game'],
+        ];
 
         foreach ($patterns as $file => $filePatterns) {
             if ($file === basename($filePath)) {
                 foreach ($filePatterns as $pattern => $replacement) {
-                    if (str_contains($replacement, ':project_name')) {
-                        $replacement = str_replace(':project_name', $name, $replacement);
-                    }
-                    if (str_contains($replacement, ':project_key')) {
-                        $replacement = str_replace(':project_key', $projectKey, $replacement);
-                    }
-                    if (str_contains($replacement, ':description')) {
-                        $replacement = str_replace(':description', $description, $replacement);
+                    foreach ($replacements as $key => $value) {
+                        if (str_contains($replacement, $key)) {
+                            $replacement = str_replace($key, $value, $replacement);
+                        }
                     }
                     $content = preg_replace($pattern, $replacement, $content);
                 }
