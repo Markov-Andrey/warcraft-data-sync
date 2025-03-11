@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\IndexPage;
+use App\Services\CrudJson;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [IndexPage::class, 'index']);
@@ -14,3 +15,11 @@ Route::post('/update-version', [App\Http\Controllers\FileController::class, 'set
 Route::post('/commit-git', [App\Http\Controllers\FileController::class, 'commitGit']);
 
 Route::get('/units', [\App\Http\Controllers\JsonController::class, 'units']);
+Route::post('/update', function (Illuminate\Http\Request $request) {
+    $db = $request->input('db');
+    $id = $request->input('id');
+    $key = $request->input('key');
+    $value = $request->input('value');
+
+    return CrudJson::updateValue($db, $id, $key, $value);
+});
