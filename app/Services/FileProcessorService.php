@@ -41,7 +41,7 @@ class FileProcessorService
                                 File::makeDirectory($targetDir, 0777, true);
                             }
                             File::copy($sourceFile, $targetPath);
-                            FileProcessorService::processFileWithPatterns($replacePatterns, $targetPath, $key, $project['name']);
+                            FileProcessorService::processFileWithPatterns($replacePatterns, $targetPath, $key, $project['name'], $project['description']);
                         }
                     }
                 }
@@ -55,7 +55,7 @@ class FileProcessorService
     /**
      * Обрабатываем файл в проекте с применением паттернов замены
      */
-    public static function processFileWithPatterns(array $patterns, string $filePath, string $projectKey, string $name): void
+    public static function processFileWithPatterns(array $patterns, string $filePath, string $projectKey, string $name, string $description): void
     {
         $content = File::get($filePath);
 
@@ -67,6 +67,9 @@ class FileProcessorService
                     }
                     if (str_contains($replacement, ':project_key')) {
                         $replacement = str_replace(':project_key', $projectKey, $replacement);
+                    }
+                    if (str_contains($replacement, ':description')) {
+                        $replacement = str_replace(':description', $description, $replacement);
                     }
                     $content = preg_replace($pattern, $replacement, $content);
                 }
