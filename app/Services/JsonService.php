@@ -55,6 +55,6 @@ class JsonService
 
     public static function mapTags()
     {
-        return ['Arthas', 'Uther', 'Tyrande', 'Wrynn', 'Whitemane', 'Alterac', 'Silithus'];
+        return ['Arthas', 'Uther', 'Tyrande', 'Wrynn', 'Whitemane', 'Hellscream', 'Kelthuzad', 'Alterac', 'Silithus'];
     }
 }
