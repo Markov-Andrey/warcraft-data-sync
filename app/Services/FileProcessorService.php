@@ -18,7 +18,6 @@ class FileProcessorService
         $child_projects = PathService::getChildProject();
         $parentProjectPath = PathService::getParentProjectPath();
         $config = json_decode(File::get($configPath), true);
-        $replacePatterns = include(config_path('w3x_replace.php'));
 
         foreach ($child_projects as $key => $project) {
             foreach ($config as $item) {
@@ -35,13 +34,14 @@ class FileProcessorService
                         FileProcessorService::copyFilesRecursive($parentProjectPath . DIRECTORY_SEPARATOR . $item['path'], $targetPath);
                     } elseif ($item['type'] === 'file') {
                         $sourceFile = $parentProjectPath . DIRECTORY_SEPARATOR . $item['path'];
-                        if (File::exists($sourceFile)) {
-                            $targetDir = dirname($targetPath);
-                            if (!File::exists($targetDir)) {
-                                File::makeDirectory($targetDir, 0777, true);
-                            }
-                            File::copy($sourceFile, $targetPath);
-                            FileProcessorService::processFileWithPatterns($replacePatterns, $targetPath, $project);
+                        $targetDir = dirname($targetPath);
+                        if (!File::exists($targetDir)) {
+                            File::makeDirectory($targetDir, 0777, true);
+                        }
+                        File::copy($sourceFile, $targetPath);
+
+                        if (basename($targetPath) === 'war3map.j') {
+                            // self::processWar3MapJ($sourceFile, $targetPath); // TODO тут логика словить содержимое и грамотно смержить и заменить переменные, чтобы не пересохранять код заново
                         }
                     }
                 }
@@ -50,6 +50,76 @@ class FileProcessorService
         InfoConfigService::lastSync();
 
         return true;
+    }
+
+    protected static function processWar3MapJ(string $sourceFile, string $targetFile): void
+    {
+        $parentContent = File::get($sourceFile);
+        $childContent = File::get($targetFile);
+
+        $keyBlocks = [
+            'Main Initialization',
+            'Players',
+            'Map Configuration',
+        ];
+
+        // Разбиваем содержимое на строки
+        $childLines = explode("\n", $childContent);
+        $parentLines = explode("\n", $parentContent);
+
+        $mergedLines = [];
+        $collectingKey = null;
+
+        // Пройдем по родителю и вставляем его ключевые блоки только если ребенок пустой
+        foreach ($parentLines as $line) {
+            foreach ($keyBlocks as $key) {
+                if (strpos($line, $key) !== false) {
+                    $collectingKey = $key;
+                    break;
+                }
+            }
+
+            if ($collectingKey !== null) {
+                // Проверяем, есть ли блок в ребенке
+                $childBlockStart = null;
+                $childBlockLines = [];
+                $insideChildBlock = false;
+
+                foreach ($childLines as $childLine) {
+                    if (strpos($childLine, $collectingKey) !== false) {
+                        $insideChildBlock = true;
+                    }
+
+                    if ($insideChildBlock) {
+                        $childBlockLines[] = $childLine;
+                        // Конец блока: следующий ключ или конец файла
+                        foreach ($keyBlocks as $key2) {
+                            if ($key2 !== $collectingKey && strpos($childLine, $key2) !== false) {
+                                $insideChildBlock = false;
+                            }
+                        }
+                    }
+                }
+
+                // Если блок ребенка пустой — вставляем блок родителя
+                if (empty(trim(implode("\n", $childBlockLines)))) {
+                    $mergedLines[] = $line;
+                } else {
+                    $mergedLines = array_merge($mergedLines, $childBlockLines);
+                }
+
+                $collectingKey = null;
+                continue;
+            }
+
+            // Остальные строки родителя просто добавляем
+            $mergedLines[] = $line;
+        }
+
+        $mergedContent = implode("\n", $mergedLines);
+
+        Log::info($mergedContent);
+        // File::put($targetFile, $mergedContent);
     }
 
     /**
