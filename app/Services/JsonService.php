@@ -236,11 +236,11 @@ class JsonService
         $filteredUnits = [];
 
         foreach ($units as $unitCode => $paramsList) {
-            if (!isset($paramsList['unam']['value'])) {
+            if (!isset($paramsList['Text - Name']['value'])) {
                 continue;
             }
 
-            $unitName = strtolower($paramsList['unam']['value']);
+            $unitName = strtolower($paramsList['Text - Name']['value']);
 
             foreach ($legendArray as $legend) {
                 if (str_contains($unitName, '[' . strtolower($legend) . ']')) {
