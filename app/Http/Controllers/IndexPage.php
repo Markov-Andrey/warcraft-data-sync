@@ -23,7 +23,10 @@ class IndexPage extends Controller
 
         $this->configService->initializeConfig();
         $configInfo = collect($this->configService->loadConfigInfo());
-        $constantFiles = collect(config('w3x_const'))
+        $copyFiles = collect(config('w3x_const.copy'))
+            ->map(fn($path) => $parentProjectPath . DIRECTORY_SEPARATOR . $path)
+            ->toArray();
+        $exceptionsFiles = collect(config('w3x_const.exceptions'))
             ->map(fn($path) => $parentProjectPath . DIRECTORY_SEPARATOR . $path)
             ->toArray();
 
@@ -31,7 +34,8 @@ class IndexPage extends Controller
             'configInfo' => $configInfo,
             'rootPath' => $parentProjectPath,
             'child_projects' => $parentChildPath ?? [],
-            'constantFiles' => $constantFiles,
+            'copyFiles' => $copyFiles ?? [],
+            'exceptionsFiles' => $exceptionsFiles ?? [],
         ]);
     }
 }

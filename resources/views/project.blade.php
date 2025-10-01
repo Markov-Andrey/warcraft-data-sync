@@ -49,11 +49,19 @@
     </div>
 
     <div class="page__constant-files">
-        <p><strong>Constant Files:</strong></p>
-        <p class="text-sm text-gray-600">These are files unique to each child project.</p>
-        @foreach($constantFiles as $file)
+        <p><strong>Copy Files (to copy from child):</strong></p>
+        @foreach($copyFiles as $file)
             <div class="page__constant-file">
                 📄 {{ basename($file) }}
+            </div>
+        @endforeach
+    </div>
+
+    <div class="page__exception-files mt-4">
+        <p><strong>Files to remove (exceptions):</strong></p>
+        @foreach($exceptionsFiles as $file)
+            <div class="page__exception-file">
+                ❌ {{ basename($file) }}
             </div>
         @endforeach
     </div>
