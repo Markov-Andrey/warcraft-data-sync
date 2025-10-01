@@ -12,7 +12,6 @@ Route::get('/copy-child', [App\Http\Controllers\FileController::class, 'copyChil
 Route::get('/set-build', [App\Http\Controllers\FileController::class, 'setBuild']);
 Route::post('/switch-project', [App\Http\Controllers\FileController::class, 'switchProject']);
 Route::post('/update-version', [App\Http\Controllers\FileController::class, 'setVersion']);
-Route::post('/commit-git', [App\Http\Controllers\FileController::class, 'commitGit']);
 
 Route::get('/units', [\App\Http\Controllers\JsonController::class, 'units']);
 Route::post('/update', function (Illuminate\Http\Request $request) {

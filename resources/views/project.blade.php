@@ -39,17 +39,6 @@
                 </div>
             @endforeach
         </div>
-        <div>
-            <div>
-                <label for="commit_message">Commit text:</label>
-            </div>
-            <div>
-                <input type="text" id="commit_message" name="commit_message" required placeholder="message">
-            </div>
-            <div class="page__button">
-                <button type="submit" onclick="setCommit()">🚀 Git Commit & Push</button>
-            </div>
-        </div>
     </div>
 
     <div class="page__buttons">
@@ -235,31 +224,6 @@
                 .then(data => {
                     if (data.success) {
                         console.log("Commit successful");
-                    } else {
-                        console.log("Error during commit");
-                    }
-                })
-                .catch(error => {
-                    console.error("Error during commit:", error);
-                });
-        }
-        function setCommit() {
-            const commitMessage = document.getElementById('commit_message').value;
-
-            fetch('/commit-git', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    commit_message: commitMessage
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        console.log("Commit successful");
-                        location.reload();
                     } else {
                         console.log("Error during commit");
                     }

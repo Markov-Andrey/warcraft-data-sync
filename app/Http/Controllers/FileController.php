@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Services\BuildGameService;
 use App\Services\ConfigService;
 use App\Services\FileProcessorService;
-use App\Services\GitService;
 use App\Services\InfoConfigService;
 use Illuminate\Http\Request;
 
@@ -66,7 +65,7 @@ class FileController extends Controller
     }
     public function setBuild()
     {
-        $updated = (new \App\Services\BuildGameService)->buildAll();
+        $updated = (new BuildGameService)->buildAll();
         if ($updated) {
             return response()->json(['success' => true]);
         } else {
@@ -89,12 +88,5 @@ class FileController extends Controller
         InfoConfigService::selectedVersion($version);
 
         return response()->json(['success' => true]);
-    }
-    public function commitGit(Request $request)
-    {
-        $commit_message = $request->input('commit_message');
-        $res = GitService::commit($commit_message);
-
-        return response()->json($res);
     }
 }
