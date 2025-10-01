@@ -70,7 +70,7 @@ class BuildGameService
         $this->processWtsFile($tmpDir);
         $this->createMpq($tmpDir, $mpqFileName);
 
-        // File::deleteDirectory($tmpDir);
+        File::deleteDirectory($tmpDir);
     }
 
     private function copyParentFiles(string $tmpDir): void
