@@ -108,46 +108,4 @@ class ConfigService
             'validated' => false,
         ];
     }
-
-    /**
-     * Универсальный метод обновления параметров элемента конфига
-     */
-    private function updateConfigItem(string $path, string $key, mixed $value): bool
-    {
-        $config = $this->loadConfigFiles();
-        $updated = false;
-
-        foreach ($config as &$item) {
-            if (str_starts_with($item['path'], $path)) {
-                $item[$key] = $value;
-                $updated = true;
-            }
-            if (!$updated && $item['path'] === $path) {
-                $item[$key] = $value;
-                $updated = true;
-            }
-        }
-
-        if ($updated) {
-            $this->saveConfigFiles($config);
-        }
-
-        return $updated;
-    }
-
-    /**
-     * Обновление статуса копирования
-     */
-    public function updateCopyStatus(string $path, bool $copy): bool
-    {
-        return $this->updateConfigItem($path, 'copy', $copy);
-    }
-
-    /**
-     * Обновление дочернего копирования
-     */
-    public function updateCopyChild(string $path, string $child): bool
-    {
-        return $this->updateConfigItem($path, 'copy_child', $child);
-    }
 }

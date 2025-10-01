@@ -1,4 +1,4 @@
-# WarCraft Data Sync (ENG)
+# WarCraft Data Sync
 
 **WarCraft Data Sync** is a system designed for transferring data from a parent project to dependent projects. It analyzes the file structure and allows you to configure which files and directories should be copied and which ones should not. The system also allows you to:
 
@@ -35,20 +35,14 @@
     composer install
     ```
 
-3. Copy `.env.example` to `.env` and set the paths for the parent and child projects:
-
-    ```bash
-    cp .env.example .env
-    ```
-
-4. Configure variables in `.env`, including paths for the parent project and build output for child projects.
+3. Configure variables in `config/w3x_projects.php`, including paths for the parent project and build output for child projects.
 
    Example:
 
     ```ini
-    PARENT_PROJECT_PATH=/path/to/parent/project
-    CHILD_PROJECTS_PATH=/path/to/child/projects
-    BUILD_PATH=/path/to/build/output
+    parent_project      =   path//to//parent//project
+    child_projects      =   path//to//child//projects
+    build_output_path   =   path//to//build//output
     ```
 
 ---
@@ -57,13 +51,13 @@
 
 The project uses several configuration files to adjust its behavior:
 
-### `.env`
+### `config/w3x_projects.php`
 
 This file contains all the main variables for the path to the parent project and the directory for building child projects:
 
-- `PARENT_PROJECT_PATH`: Path to the parent project.
-- `CHILD_PROJECTS_PATH`: Path to the child project directories.
-- `BUILD_PATH`: Path for saving the built archives.
+- `parent_project`: Path to the parent project.
+- `child_projects`: Path to the child project directories.
+- `build_output_path`: Path for saving the built archives.
 
 ### `config/w3x_const.php`
 
@@ -112,7 +106,7 @@ The server will be available at `http://localhost:8000`.
 
 ## Example Usage
 
-1. Specify the paths to the parent project and child projects in `.env`.
+1. Specify the paths to the parent project and child projects in `config/w3x_projects.php`.
 2. Set the parameters in the web interface:
     - Choose the parent project.
     - Choose the child project.
@@ -130,135 +124,42 @@ The server will be available at `http://localhost:8000`.
 
 ---
 
-# WarCraft Data Sync (RU)
+## Warcraft III Map File Reference
 
-**WarCraft Data Sync** — это система для переноса данных от родительского проекта к зависимым проектам. Она анализирует файловую структуру и позволяет настраивать, какие файлы и директории должны быть скопированы, а какие нет. Также система позволяет:
+This is a reference of important map files and their purposes.
 
-- Указывать файлы и директории, уникальные для зависимого проекта.
-- Очищать технические теги в файле `war3map.wts`.
-- Вносить изменения в файл `war3map.j` согласно заданному паттерну.
-- Собрать дочерние проекты в архив формата `.w3x`, который включает все изменения и версии.
-- Переносить карту дочернего проекта в родительский.
-
----
-
-## Стек технологий
-
-- **Backend**: Laravel 8.x
-- **Frontend**: Blade
-- **PHP**: 8.1
-- **Без базы данных**: Использует файловую структуру и директорию `.data-sync` для хранения всех данных и метаданных.
-- **Архивы**: `.w3x` — формат архива для сборки финальных паков.
-
----
-
-## Установка
-
-1. Клонируйте репозиторий:
-
-    ```bash
-    git clone https://github.com/Markov-Andrey/warcraft-data-sync.git
-    cd warcraft-data-sync
-    ```
-
-2. Установите зависимости:
-
-    ```bash
-    composer install
-    ```
-
-3. Скопируйте файл `.env.example` в `.env` и настройте пути к родительским и дочерним проектам:
-
-    ```bash
-    cp .env.example .env
-    ```
-
-4. Настройте переменные в `.env`, включая пути к родительскому проекту и сборке для дочерних проектов.
-
-   Пример:
-
-    ```ini
-    PARENT_PROJECT_PATH=/path/to/parent/project
-    CHILD_PROJECTS_PATH=/path/to/child/projects
-    BUILD_PATH=/path/to/build/output
-    ```
-
----
-
-## Конфигурация
-
-Проект использует несколько конфигурационных файлов для настройки работы:
-
-### `.env`
-
-В этом файле указаны все основные переменные для пути к родительскому проекту и директории для сборки дочерних проектов:
-
-- `PARENT_PROJECT_PATH`: Путь к родительскому проекту.
-- `CHILD_PROJECTS_PATH`: Путь к директориям дочерних проектов.
-- `BUILD_PATH`: Путь для сохранения собранных билдов.
-
-### `config/w3x_const.php`
-
-Этот файл содержит константы, которые управляют блокировкой копирования файлов и указанием файлов, которые должны копироваться в родительский проект при свиче.
-
-### `config/w3x_replace.php`
-
-Этот файл содержит правила автозамены для проекта. В нем задаются паттерны для замены текста или строк в файлах, а также на что эти паттерны заменяются.
-
----
-
-## Веб-интерфейс
-
-Проект включает веб-интерфейс на основе **Laravel** и **Blade**. Интерфейс позволяет:
-
-- **Switch**: Параметр "Current Project" используется для выполнения свича между различными дочерними проектами.
-- **Versions**: Параметр "Build Version" добавляет постфикс версии в собранный архив (например, `<title>-<version>.w3x`).
-
----
-
-## Запуск сервера
-
-1. Убедитесь, что у вас установлен **PHP 8.1**.
-2. Запустите сервер:
-
-    ```bash
-    php artisan serve
-    ```
-
-Сервер будет доступен по адресу `http://localhost:8000`.
-
----
-
-## Описание работы
-
-**WarCraft Data Sync** выполняет несколько операций для каждого дочернего проекта:
-
-1. **Анализ файловой структуры**: Система анализирует файлы и директории в проекте, используя конфигурацию из `.env` и `config/w3x_const.php`.
-2. **Фильтрация файлов**: Определяет, какие файлы должны быть скопированы в зависимости от настроек.
-3. **Автозамена**: Применяет автозамены в соответствии с правилами из `config/w3x_replace.php`.
-4. **Очищение тегов**: Очищает технические теги из файла `war3map.wts`, если это предусмотрено.
-5. **Свич**: Параметр "Current Project" позволяет переключаться между дочерними проектами.
-6. **Сборка архива**: Все изменения собираются в архив `.w3x`, который включает все необходимые файлы и изменения.
-
----
-
-## Пример использования
-
-1. Укажите в `.env` пути к родительскому проекту и дочерним проектам.
-2. Настройте параметры в веб-интерфейсе:
-    - Выберите родительский проект.
-    - Выберите дочерний проект.
-    - Укажите версию билда.
-3. Нажмите **"Собрать"** для создания архива `.w3x` с нужной версией.
-
----
-
-## Важные файлы и директории
-
-- **.data-sync**: Директория, которая выполняет роль базы данных. Хранит все метаданные о последней операции, а также архитектуру файлов.
-- **.env**: Конфигурационный файл, где задаются пути к проектам и другие переменные.
-- **config/w3x_const.php**: Файл с константами для настройки блокировки копирования.
-- **config/w3x_replace.php**: Файл для автозамены в проекте.
-
----
-
+| File Name         | Description                                                                      |
+|-------------------|----------------------------------------------------------------------------------|
+| war3map.j         | Code                                                                             |
+| war3map.w3e       | Terrain texturing                                                                |
+| war3map.shd       | Shadow map                                                                       |
+| war3map.wpm       | Passability map                                                                  |
+| war3map.doo       | Info about trees                                                                 |
+| war3mapUnits.doo  | Information about all objects placed on map                                      |
+| war3map.w3i       | Various information set in the editor in the scenario section                    |
+| war3map.wts       | String values (TRIGSTR)                                                          |
+| war3mapMap.blp    | Minimap                                                                          |
+| war3map.mmp       | Minimap icons during initialization                                              |
+| war3map.w3u       | Units - Objects                                                                  |
+| war3map.wtg       | Trigger and variable names                                                       |
+| war3map.w3c       | Camera parameters                                                                |
+| war3map.w3r       | Info by regions                                                                  |
+| war3map.w3s       | Sounds are set                                                                   |
+| war3map.wct       | Map script + any text script                                                     |
+| war3map.imp       | Contains info about imported files                                               |
+| war3mapMisc.txt   | Constants                                                                        |
+| war3mapExtra.txt  | Editor settings                                                                  |
+| war3map.w3a       | Abilities - Objects                                                              |
+| war3map.w3b       | Destructables - Objects                                                          |
+| war3map.w3d       | Doodads - Objects                                                                |
+| war3map.w3h       | Buffs - Objects                                                                  |
+| war3map.w3q       | Upgrades - Objects                                                               |
+| war3map.w3t       | Items - Objects                                                                  |
+| war3mapSkin.w3a   | Skin data - Abilities                                                            |
+| war3mapSkin.w3b   | Skin data - Destructables                                                        |
+| war3mapSkin.w3d   | Skin data - Doodads                                                              |
+| war3mapSkin.w3h   | Skin data - Buffs                                                                |
+| war3mapSkin.w3q   | Skin data - Upgrades                                                             |
+| war3mapSkin.w3t   | Skin data - Items                                                                |
+| war3mapSkin.w3u   | Skin data - Units                                                                |
+| conversation.json | Needed to match portrait talking animations to their respective sound file lines |

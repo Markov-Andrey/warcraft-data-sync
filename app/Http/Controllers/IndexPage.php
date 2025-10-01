@@ -16,45 +16,21 @@ class IndexPage extends Controller
         $this->configService = $configService;
     }
 
-    public function index(Request $request)
+    public function index()
     {
         $parentProjectPath = PathService::getParentProjectPath();
         $parentChildPath = PathService::getChildProject();
-        $currentPath = $request->get('path', $parentProjectPath);
-
-        if (!str_starts_with($currentPath, $parentProjectPath)) {
-            abort(403, 'Access denied to the requested directory.');
-        }
 
         $this->configService->initializeConfig();
-        $jsonCopy = collect($this->configService->loadConfigFiles())->pluck('copy', 'path');
-        $jsonCopyChild = collect($this->configService->loadConfigFiles())->pluck('copy_child', 'path');
-        $jsonValid = collect($this->configService->loadConfigFiles())->pluck('validated', 'path');
         $configInfo = collect($this->configService->loadConfigInfo());
         $constantFiles = collect(config('w3x_const'))
             ->map(fn($path) => $parentProjectPath . DIRECTORY_SEPARATOR . $path)
             ->toArray();
 
-        $items = collect(File::directories($currentPath))
-            ->merge(File::files($currentPath))
-            ->map(fn($item) => [
-                'path' => $path = is_string($item) ? $item : $item->getRealPath(),
-                'relativePath' => $relativePath = str_replace($parentProjectPath . DIRECTORY_SEPARATOR, '', $path),
-                'name' => basename($item),
-                'type' => is_string($item) ? 'directory' : 'file',
-                'copy' => $jsonCopy[$relativePath] ?? false,
-                'copy_child' => $jsonCopyChild[$relativePath] ?? '',
-                'validated' => $jsonValid[$relativePath] ?? false,
-            ])
-            ->groupBy('type');
-
         return view('project', [
             'configInfo' => $configInfo,
             'rootPath' => $parentProjectPath,
             'child_projects' => $parentChildPath ?? [],
-            'directories' => $items['directory'] ?? [],
-            'files' => $items['file'] ?? [],
-            'currentPath' => $currentPath,
             'constantFiles' => $constantFiles,
         ]);
     }

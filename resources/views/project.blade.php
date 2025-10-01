@@ -3,7 +3,6 @@
 @section('title', 'WarCraft Data Sync')
 
 @section('content')
-    <p class="page__current-path"><strong>Current Path:</strong> {{ $currentPath }}</p>
     <div class="flex">
         <div>
             <div class="page__current-path">
@@ -20,10 +19,10 @@
                         @endforeach
                     </select>
                 </div>
-                <div><strong>Last sync:</strong> {{$configInfo['last_synced']}}</div>
-                <div><strong>Last build:</strong> {{$configInfo['last_build']}}</div>
+                <div><strong>Last sync:</strong> {{ $configInfo['last_synced'] }}</div>
+                <div><strong>Last build:</strong> {{ $configInfo['last_build'] }}</div>
                 <div><strong>Build version:</strong>
-                    <input type="text" value="{{$configInfo['build_version']}}" onchange="handleBuildChange(this)">
+                    <input type="text" value="{{ $configInfo['build_version'] }}" onchange="handleBuildChange(this)">
                 </div>
             </div>
         </div>
@@ -34,7 +33,7 @@
                     @if($key == $configInfo['current_project'])
                         ✅
                     @endif
-                    {{ $project['name'] }} ({{$key}})
+                    {{ $project['name'] }} ({{ $key }})
                 </div>
             @endforeach
         </div>
@@ -49,62 +48,19 @@
         </div>
     </div>
 
-    <div class="page__file-list">
-        <div class="page__file-list-header">
-            <div class="page__file-list-item">Item</div>
-            <div class="page__file-list-item">Copy</div>
-            <div class="page__file-list-item">Child Project</div>
-        </div>
-
-        @if ($currentPath !== \App\Services\PathService::getParentProjectPath())
-            <div class="page__link">
-                <a href="{{ url('/') }}?path={{ rtrim(dirname($currentPath), '/') }}" class="page__link-text">
-                    ...
-                </a>
+    <div class="page__constant-files">
+        <p><strong>Constant Files:</strong></p>
+        <p class="text-sm text-gray-600">These are files unique to each child project.</p>
+        @foreach($constantFiles as $file)
+            <div class="page__constant-file">
+                📄 {{ basename($file) }}
             </div>
-        @endif
-
-        @foreach ($directories as $directory)
-            @php
-                $item = $directory;
-                $itemType = 'directory';
-            @endphp
-            @include('partials.file-directory-row', ['item' => $item, 'itemType' => $itemType, 'constantFiles' => $constantFiles])
-        @endforeach
-
-        @foreach ($files as $file)
-            @php
-                $item = $file;
-                $itemType = 'file';
-            @endphp
-            @include('partials.file-directory-row', ['item' => $item, 'itemType' => $itemType, 'constantFiles' => $constantFiles])
         @endforeach
     </div>
 @endsection
 
 @push('scripts')
     <script>
-        function updateCheckboxChange(itemPath, checkbox) {
-            const path = cleanPath(itemPath, @json($rootPath));
-            const copy = checkbox.checked ? 1 : 0;
-            fetch('/update-copy-status', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    path: path,
-                    copy: copy
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Updated:', data);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        }
         function copyChild() {
             fetch('/copy-child', {
                 method: 'GET',
@@ -186,35 +142,6 @@
                 .catch(error => {
                     console.error("Error during version:", error);
                 });
-        }
-        function updateParentValue(itemPath, value) {
-            const path = cleanPath(itemPath, @json($rootPath));
-            fetch('/update-copy-child', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    path: path,
-                    child: value
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        console.log("Commit successful");
-                    } else {
-                        console.log("Error during commit");
-                    }
-                })
-                .catch(error => {
-                    console.error("Error during commit:", error);
-                });
-        }
-        function cleanPath(path, rootPath) {
-            path = path.replace(/^directorys\[|\]$/g, '');
-            path = path.replace(/^files\[|\]$/g, '');
-            return path.replace(rootPath + '\\', '');
         }
     </script>
 @endpush
