@@ -150,22 +150,4 @@ class ConfigService
     {
         return $this->updateConfigItem($path, 'copy_child', $child);
     }
-
-    /**
-     * Обновление статуса валидации новых файлов
-     */
-    public function updateValidateStatus(): bool
-    {
-        InfoConfigService::lastCheck();
-
-        $files = $this->loadConfigFiles();
-
-        foreach ($files as &$item) {
-            $item['validated'] = true;
-        }
-
-        $this->saveConfigFiles($files);
-
-        return true;
-    }
 }

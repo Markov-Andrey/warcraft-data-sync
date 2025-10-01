@@ -20,7 +20,6 @@
                         @endforeach
                     </select>
                 </div>
-                <div><strong>Last checked:</strong> {{$configInfo['last_checked']}}</div>
                 <div><strong>Last sync:</strong> {{$configInfo['last_synced']}}</div>
                 <div><strong>Last build:</strong> {{$configInfo['last_build']}}</div>
                 <div><strong>Build version:</strong>
@@ -42,9 +41,6 @@
     </div>
 
     <div class="page__buttons">
-        <div class="page__button">
-            <button type="submit" onclick="commitFiles()">✅ All new files checked @if($countNewFiles) <div class="page__button__circle">{{ $countNewFiles }}</div> @endif</button>
-        </div>
         <div class="page__button">
             <button type="submit" onclick="copyChild()">🔄 Sync to Child</button>
         </div>
@@ -107,23 +103,6 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                });
-        }
-        function commitFiles() {
-            fetch('/commit', {
-                method: 'GET',
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Commit successful:', data);
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        console.error('Error in commit:', data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error during commit:', error);
                 });
         }
         function copyChild() {
