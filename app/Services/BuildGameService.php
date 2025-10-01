@@ -12,9 +12,9 @@ class BuildGameService
 
     public function __construct()
     {
-        $this->mpqPath = base_path('tools/MPQEditor/MPQEditor.exe');
-        $this->childProjects = json_decode(env('CHILD_PROJECTS'), true);
-        $this->buildOutputPath = env('BUILD_OUTPUT_PATH');
+        $this->mpqPath = PathService::getMpqPath();
+        $this->childProjects = PathService::getChildProject();
+        $this->buildOutputPath = PathService::getBuildOutputPath();
     }
 
     public function buildAll()

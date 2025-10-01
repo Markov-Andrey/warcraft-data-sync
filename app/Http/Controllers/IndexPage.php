@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\ConfigService;
+use App\Services\PathService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 
@@ -17,8 +18,8 @@ class IndexPage extends Controller
 
     public function index(Request $request)
     {
-        $parentProjectPath = env('PARENT_PROJECT');
-        $parentChildPath = json_decode(env('CHILD_PROJECTS'), true);
+        $parentProjectPath = PathService::getParentProjectPath();
+        $parentChildPath = PathService::getChildProject();
         $currentPath = $request->get('path', $parentProjectPath);
 
         if (!str_starts_with($currentPath, $parentProjectPath)) {

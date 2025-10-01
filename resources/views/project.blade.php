@@ -71,7 +71,7 @@
             <div class="page__file-list-item">Child Project</div>
         </div>
 
-        @if ($currentPath !== env('PARENT_PROJECT'))
+        @if ($currentPath !== \App\Services\PathService::getParentProjectPath())
             <div class="page__link">
                 <a href="{{ url('/') }}?path={{ rtrim(dirname($currentPath), '/') }}" class="page__link-text">
                     ...

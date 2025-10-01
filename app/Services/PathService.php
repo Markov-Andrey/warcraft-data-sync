@@ -10,7 +10,7 @@ class PathService
 
     public static function getProjectPath()
     {
-        return env('PROJECT');
+        return config('w3x_projects.project_dir');
     }
     public static function getConfigFilePath(): string
     {
@@ -29,11 +29,21 @@ class PathService
 
     public static function getParentProjectPath(): string
     {
-        return env('PARENT_PROJECT');
+        return config('w3x_projects.parent_project');
     }
 
     public static function getChildProject(): array
     {
-        return json_decode(env('CHILD_PROJECTS'), true);
+        return config('w3x_projects.child_projects');
+    }
+
+    public static function getBuildOutputPath(): string
+    {
+        return config('w3x_projects.build_output_path');
+    }
+
+    public static function getMpqPath(): string
+    {
+        return base_path('tools/MPQEditor/MPQEditor.exe');
     }
 }

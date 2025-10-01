@@ -174,8 +174,8 @@ class FileProcessorService
     public static function switch($select)
     {
         $swapFiles = config('w3x_const');
-        $projects = json_decode(env('CHILD_PROJECTS'), true);
-        $parentProjectPath = env('PARENT_PROJECT');
+        $projects = PathService::getChildProject();
+        $parentProjectPath = PathService::getParentProjectPath();
 
         if (!isset($projects[$select])) {
             return response()->json(['success' => false, 'message' => 'Проект не найден']);
