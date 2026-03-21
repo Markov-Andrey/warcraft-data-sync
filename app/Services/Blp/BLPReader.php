@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Services\Blp;
+
 class BLPReader
 {
 
@@ -10,7 +12,7 @@ class BLPReader
     {
         if ($openFile != null && get_resource_type($openFile) == 'file')
         {
-            throw new Exception("BLPReader must take a file handle.");
+            throw new \Exception("BLPReader must take a file handle.");
         }
 
         $this->file = $openFile;

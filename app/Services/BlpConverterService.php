@@ -2,9 +2,8 @@
 
 namespace App\Services;
 
-use BLPImage;
+use App\Services\Blp\BLPImage;
 use Exception;
-use Illuminate\Support\Facades\Log;
 use ValueError;
 
 class BlpConverterService
@@ -18,8 +17,6 @@ class BlpConverterService
         $this->sourcePath = $sourcePath ?? storage_path('app/public/blp');
         $this->targetPath = $targetPath ?? storage_path('app/public/png');
 
-        // подключаем либу
-        require_once app_path('Services/Blp/blp.php');
     }
 
     public function convert(string $filename, string $format = 'png'): string

@@ -1,10 +1,11 @@
 <?php
+
+namespace App\Services\Blp;
+
 /*
     Created by TriggerHappy
 */
-require_once __DIR__ . '/blp.reader.php';
 
-// constants
 const MAGIC_BLP_V0          = "BLP0";
 const MAGIC_BLP_V1          = "BLP1";
 const MAGIC_BLP_V2          = "BLP2";
@@ -21,14 +22,14 @@ class BLPImage
     private $image, $imageData;
 
     /**
-     * @throws ImagickException
-     * @throws Exception
+     * @throws \ImagickException
+     * @throws \Exception
      */
     function __construct($path)
     {
         if (!file_exists($path))
         {
-            throw new Exception('File doesn\'t exist.');
+            throw new \Exception('File doesn\'t exist.');
         }
 
         $this->filename = $path;
@@ -38,7 +39,7 @@ class BLPImage
 
         if (!$this->parse())
         {
-            throw new Exception('Invalid image header.');
+            throw new \Exception('Invalid image header.');
         }
     }
 
@@ -73,7 +74,7 @@ class BLPImage
 
 
     /**
-     * @throws ImagickException
+     * @throws \ImagickException
      */
     private function parse()
     {
@@ -83,7 +84,7 @@ class BLPImage
         while (!$valid_header && $this->stream->fp < $this->filesize) {
             $buffer = $this->stream->readBytes(4);
 
-            if ($buffer == MAGIC_BLP_V2) throw new Exception("BLP2 files are not supported.");
+            if ($buffer == MAGIC_BLP_V2) throw new \Exception("BLP2 files are not supported.");
             if ($buffer != MAGIC_BLP_V0 && $buffer != MAGIC_BLP_V1) continue;
 
             // parse header
@@ -101,7 +102,7 @@ class BLPImage
             } else {
                 $info = pathinfo($this->filename);
                 $fname = "{$info['dirname']}/".basename($info['basename'],'.'.$info['extension']).".b00";
-                if (!file_exists($fname)) throw new Exception("BLP0 image is missing a mipmap file.");
+                if (!file_exists($fname)) throw new \Exception("BLP0 image is missing a mipmap file.");
                 $this->imageData = file_get_contents($fname);
             }
 
@@ -119,9 +120,9 @@ class BLPImage
                     $this->imageData = $this->stream->readBytes($this->mipmapSize[0]);
                 }
 
-                $this->image = new Imagick();
+                $this->image = new \Imagick();
                 $this->image->readImageBlob($jpeg_header . $this->imageData);
-                $this->image->setColorspace(Imagick::COLORSPACE_SRGB);
+                $this->image->setColorspace(\Imagick::COLORSPACE_SRGB);
                 $this->rebuildWithoutAlpha();
                 $this->image = BLPImage::BGR2RGB($this->image);
             }
@@ -133,7 +134,7 @@ class BLPImage
     }
 
     /**
-     * @throws ImagickException
+     * @throws \ImagickException
      */
     private function parsePaletted(): void
     {
@@ -168,20 +169,20 @@ class BLPImage
 
         ob_start();
         imagepng($im);
-        $this->image = new Imagick();
+        $this->image = new \Imagick();
         $this->image->readImageBlob(ob_get_clean());
         imagedestroy($im);
     }
 
     /**
-     * @throws ImagickException
+     * @throws \ImagickException
      */
     private function rebuildWithoutAlpha(): void
     {
         $this->image = (function($img, $w, $h) {
-            $out = new Imagick();
-            $out->newImage($w, $h, new ImagickPixel('transparent'));
-            foreach (['blue'=>Imagick::COMPOSITE_COPYBLUE, 'green'=>Imagick::COMPOSITE_COPYGREEN, 'red'=>Imagick::COMPOSITE_COPYRED] as $color => $comp) {
+            $out = new \Imagick();
+            $out->newImage($w, $h, new \ImagickPixel('transparent'));
+            foreach (['blue'=>\Imagick::COMPOSITE_COPYBLUE, 'green'=>\Imagick::COMPOSITE_COPYGREEN, 'red'=>\Imagick::COMPOSITE_COPYRED] as $color => $comp) {
                 $tmp = clone $img;
                 $tmp->separateImageChannel(constant("Imagick::CHANNEL_" . strtoupper($color)));
                 $out->compositeImage($tmp, $comp, 0, 0);
