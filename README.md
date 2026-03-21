@@ -14,7 +14,7 @@
 
 - **Backend**: Laravel 8.x
 - **Frontend**: Blade
-- **PHP**: 8.1
+- **PHP**: 8.5
 - **No Database**: Uses file structure and `.data-sync` directory to store all data and metadata.
 - **Archives**: `.w3x` — the archive format for building final packs.
 

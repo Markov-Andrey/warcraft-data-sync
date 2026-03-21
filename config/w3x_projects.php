@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'project_dir' => "C:\\Users\\User\\Documents\\Warcraft III\\Maps\\legends",
-    'parent_project' => "C:\\Users\\User\\Documents\\Warcraft III\\Maps\\legends\\MainProject.w3x",
+    'project_dir' => "C:\\Users\\Markov\\Documents\\Warcraft III\\Maps\\legends",
+    'parent_project' => "C:\\Users\\Markov\\Documents\\Warcraft III\\Maps\\legends\\MainProject.w3x",
     'child_projects' => [
         'alterac' => [
             'key' => 'alterac',
@@ -10,7 +10,7 @@ return [
             'description' => 'Some description for Alterac',
             'type_game' => 'PvE 2vE',
             'author' => 'AMarkov',
-            'path' => "C:\\Users\\User\\Documents\\Warcraft III\\Maps\\legends\\Child\\AlteracJustice.w3x",
+            'path' => "C:\\Users\\Markov\\Documents\\Warcraft III\\Maps\\legends\\Child\\AlteracJustice.w3x",
         ],
         'silithus' => [
             'key' => 'silithus',
@@ -18,7 +18,7 @@ return [
             'description' => 'Some description for Silithus',
             'type_game' => 'PvE 2vE',
             'author' => 'AMarkov',
-            'path' => "C:\\Users\\User\\Documents\\Warcraft III\\Maps\\legends\\Child\\VoicesOfSands.w3x",
+            'path' => "C:\\Users\\Markov\\Documents\\Warcraft III\\Maps\\legends\\Child\\VoicesOfSands.w3x",
         ],
         'warsong' => [
             'key' => 'warsong',
@@ -26,8 +26,8 @@ return [
             'description' => 'Some description for Warsong',
             'type_game' => 'PvP 2v2',
             'author' => 'AMarkov',
-            'path' => "C:\\Users\\User\\Documents\\Warcraft III\\Maps\\legends\\Child\\WarsongGulch.w3x",
+            'path' => "C:\\Users\\Markov\\Documents\\Warcraft III\\Maps\\legends\\Child\\WarsongGulch.w3x",
         ],
     ],
-    'build_output_path' => "C:\\Users\\User\\Documents\\Warcraft III\\Maps\\legends\\builds",
+    'build_output_path' => "C:\\Users\\Markov\\Documents\\Warcraft III\\Maps\\legends\\builds",
 ];
