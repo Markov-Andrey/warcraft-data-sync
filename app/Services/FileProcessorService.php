@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -171,9 +172,11 @@ class FileProcessorService
             File::copy($file->getRealPath(), $targetFile);
         }
     }
+
     public static function switch($select)
     {
-        $swapFiles = config('w3x_const');
+        $w3xConst = config('w3x_const');
+        $swapFiles = $w3xConst['copy'] ?? [];
         $projects = PathService::getChildProject();
         $parentProjectPath = PathService::getParentProjectPath();
 
@@ -184,6 +187,10 @@ class FileProcessorService
         $childProjectDir = $projects[$select]['path'];
 
         foreach ($swapFiles as $file) {
+            if (!is_string($file)) {
+                continue;
+            }
+
             $childFilePath = $childProjectDir . DIRECTORY_SEPARATOR . $file;
             $parentFilePath = $parentProjectPath . DIRECTORY_SEPARATOR . $file;
 
