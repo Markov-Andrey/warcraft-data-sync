@@ -1,14 +1,16 @@
 import './bootstrap';
 import { createApp } from 'vue';
-import ProjectApp from './components/ProjectApp.vue';
-import UnitsApp from './components/UnitsApp.vue';
+import { createRouter, createWebHistory } from 'vue-router';
+import App from './App.vue';
+import ProjectPage from './pages/ProjectPage.vue';
+import UnitsPage from './pages/UnitsPage.vue';
 
-const projectEl = document.getElementById('project-app');
-if (projectEl) {
-    createApp(ProjectApp, JSON.parse(projectEl.dataset.props)).mount(projectEl);
-}
+const router = createRouter({
+    history: createWebHistory(),
+    routes: [
+        { path: '/', component: ProjectPage },
+        { path: '/units', component: UnitsPage },
+    ],
+});
 
-const unitsEl = document.getElementById('units-app');
-if (unitsEl) {
-    createApp(UnitsApp, JSON.parse(unitsEl.dataset.props)).mount(unitsEl);
-}
+createApp(App).use(router).mount('#app');

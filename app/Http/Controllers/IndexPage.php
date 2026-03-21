@@ -16,26 +16,26 @@ class IndexPage extends Controller
         $this->configService = $configService;
     }
 
-    public function index()
+    public function projectInfo()
     {
         $parentProjectPath = PathService::getParentProjectPath();
-        $parentChildPath = PathService::getChildProject();
 
         $this->configService->initializeConfig();
-        $configInfo = collect($this->configService->loadConfigInfo());
+        $configInfo = $this->configService->loadConfigInfo();
         $copyFiles = collect(config('w3x_const.copy'))
-            ->map(fn($path) => $parentProjectPath . DIRECTORY_SEPARATOR . $path)
+            ->map(fn($path) => basename($path))
+            ->values()
             ->toArray();
         $exceptionsFiles = collect(config('w3x_const.exceptions'))
-            ->map(fn($path) => $parentProjectPath . DIRECTORY_SEPARATOR . $path)
+            ->map(fn($path) => basename($path))
+            ->values()
             ->toArray();
 
-        return view('project', [
-            'configInfo' => $configInfo,
-            'rootPath' => $parentProjectPath,
-            'child_projects' => $parentChildPath ?? [],
-            'copyFiles' => $copyFiles ?? [],
-            'exceptionsFiles' => $exceptionsFiles ?? [],
+        return response()->json([
+            'configInfo'      => $configInfo,
+            'childProjects'   => PathService::getChildProject() ?? [],
+            'copyFiles'       => $copyFiles,
+            'exceptionsFiles' => $exceptionsFiles,
         ]);
     }
 }

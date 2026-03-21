@@ -1,19 +1,25 @@
 <?php
 
+use App\Http\Controllers\FileController;
+use App\Http\Controllers\IndexPage;
+use App\Http\Controllers\JsonController;
+use App\Services\CrudJson;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
+Route::get('/project-info', [IndexPage::class, 'projectInfo']);
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::get('/copy-child', [FileController::class, 'copyChild']);
+Route::get('/set-build', [FileController::class, 'setBuild']);
+Route::post('/switch-project', [FileController::class, 'switchProject']);
+Route::post('/update-version', [FileController::class, 'setVersion']);
+
+Route::get('/units', [JsonController::class, 'units']);
+Route::post('/update', function (Request $request) {
+    return CrudJson::updateValue(
+        $request->input('db'),
+        $request->input('id'),
+        $request->input('key'),
+        $request->input('value'),
+    );
 });

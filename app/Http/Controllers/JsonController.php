@@ -92,7 +92,7 @@ class JsonController extends Controller
             }
         }
 
-        return view('units', [
+        return response()->json([
             'units'   => $parsedUnits,
             'tags'    => $tags,
             'allKeys' => $allKeys,
