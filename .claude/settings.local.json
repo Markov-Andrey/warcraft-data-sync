@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(find D:Projectswarcraft-data-syncresources -type f \\\\\\(-name *.blade.php -o -name *.js -o -name *.css \\\\\\))",
-      "Bash(npm install:*)",
-      "Bash(npm run:*)"
-    ]
-  }
-}
