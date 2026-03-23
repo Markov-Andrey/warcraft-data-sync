@@ -18,8 +18,6 @@
             </button>
             <span v-if="actionResult !== null" :class="actionResult.success ? 'text-green-400' : 'text-red-400'" class="text-sm">
                 {{ actionResult.success ? 'Done' : 'Error' }}
-                <span v-if="actionResult.output" class="text-gray-400 ml-1">— {{ actionResult.output }}</span>
-                <span v-if="actionResult.log" class="text-gray-400 ml-1">— {{ JSON.stringify(actionResult.log) }}</span>
             </span>
         </div>
 
