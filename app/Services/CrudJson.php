@@ -4,6 +4,7 @@ namespace App\Services;
 
 class CrudJson
 {
+    // TODO есть проблема, нужно создавать поле когда его нет в json и важен тип "int" - число, и "unreal" - float, а значение храни без кавычек
     public static function updateValue($db, $id, $key, $value)
     {
         try {
