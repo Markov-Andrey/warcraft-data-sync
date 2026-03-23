@@ -14,6 +14,7 @@ Route::get('/set-build', [FileController::class, 'setBuild']);
 Route::post('/switch-project', [FileController::class, 'switchProject']);
 Route::post('/update-version', [FileController::class, 'setVersion']);
 
+Route::get('/parse-map', [JsonController::class, 'parseMap']);
 Route::get('/units', [JsonController::class, 'units']);
 Route::post('/update', function (Request $request) {
     return CrudJson::updateValue(

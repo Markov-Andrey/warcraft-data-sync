@@ -10,6 +10,22 @@ use Illuminate\Http\Request;
 
 class JsonController extends Controller
 {
+    public function parseMap()
+    {
+        $path = PathService::getParentProjectPath();
+
+        $files = ['war3map.w3u', 'war3mapSkin.w3u', 'war3map.wts'];
+
+        foreach ($files as $file) {
+            $src = $path . DIRECTORY_SEPARATOR . $file;
+            if (file_exists($src)) {
+                MapConverterService::convertToJson($src, $src);
+            }
+        }
+
+        return response()->json(['success' => true]);
+    }
+
     public function units(Request $request)
     {
         $path = PathService::getParentProjectPath();

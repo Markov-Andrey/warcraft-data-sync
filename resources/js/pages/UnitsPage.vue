@@ -1,6 +1,19 @@
 <template>
     <div class="p-6">
-        <h1 class="text-2xl font-bold text-yellow-400 mb-4">Units</h1>
+        <div class="flex items-center gap-4 mb-4">
+            <h1 class="text-2xl font-bold text-yellow-400">Units</h1>
+            <button
+                @click="parseMap"
+                :disabled="parsing"
+                class="px-3 py-1 rounded text-sm font-medium transition-colors bg-gray-700 hover:bg-gray-600 text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                {{ parsing ? 'Parsing...' : 'Parse Map' }}
+            </button>
+            <span v-if="parseResult !== null" :class="parseResult.success ? 'text-green-400' : 'text-red-400'" class="text-sm">
+                {{ parseResult.success ? 'Done' : 'Error' }}
+                <span v-if="parseResult.output" class="text-gray-400 ml-1">— {{ parseResult.output }}</span>
+            </span>
+        </div>
 
         <!-- Loading -->
         <div v-if="loading" class="text-gray-400 text-sm">Loading units...</div>
@@ -83,6 +96,8 @@
 import { ref, computed, onMounted } from 'vue';
 
 const loading = ref(true);
+const parsing = ref(false);
+const parseResult = ref(null);
 const units = ref({});
 const tags = ref([]);
 const allKeys = ref([]);
@@ -112,6 +127,19 @@ const filteredUnits = computed(() => {
         })
     );
 });
+
+async function parseMap() {
+    parsing.value = true;
+    parseResult.value = null;
+    try {
+        const { data } = await axios.get('/parse-map');
+        parseResult.value = data;
+    } catch (e) {
+        parseResult.value = { success: false, output: e?.response?.data?.message ?? 'Request failed' };
+    } finally {
+        parsing.value = false;
+    }
+}
 
 function setLegend(tag) {
     activeLegend.value = tag;
