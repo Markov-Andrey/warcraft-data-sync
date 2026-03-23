@@ -67,8 +67,20 @@
                                 v-for="key in allKeys"
                                 :key="key"
                                 class="px-2 py-1 border border-gray-700/50 text-gray-300 break-words"
+                                :class="{ 'cursor-pointer select-none': key !== 'uico_png' }"
+                                @dblclick="key !== 'uico_png' && startEdit(unitCode, key, params)"
                             >
-                                <template v-if="key === 'uico_png' && getCellValue(params, key)">
+                                <template v-if="isEditing(unitCode, key)">
+                                    <input
+                                        v-model="editingValue"
+                                        @blur="saveEdit(unitCode, key, params)"
+                                        @keyup.enter="saveEdit(unitCode, key, params)"
+                                        @keyup.escape="cancelEdit"
+                                        class="w-full bg-gray-900 border border-yellow-500 text-gray-100 px-1 py-0 text-xs rounded outline-none"
+                                        v-focus
+                                    />
+                                </template>
+                                <template v-else-if="key === 'uico_png' && getCellValue(params, key)">
                                     <img
                                         :src="'/storage/png/' + getCellValue(params, key)"
                                         :alt="unitCode"
@@ -94,6 +106,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+
+const vFocus = { mounted: (el) => el.focus() };
 
 const loading = ref(true);
 const parsing = ref(false);
@@ -138,6 +152,43 @@ async function parseMap() {
         parseResult.value = { success: false, output: e?.response?.data?.message ?? 'Request failed' };
     } finally {
         parsing.value = false;
+    }
+}
+
+const editingCell = ref(null); // { unitCode, key }
+const editingValue = ref('');
+
+function isEditing(unitCode, key) {
+    return editingCell.value?.unitCode === unitCode && editingCell.value?.key === key;
+}
+
+function startEdit(unitCode, key, params) {
+    editingCell.value = { unitCode, key };
+    editingValue.value = String(getCellValue(params, key) ?? '');
+}
+
+function cancelEdit() {
+    editingCell.value = null;
+    editingValue.value = '';
+}
+
+async function saveEdit(unitCode, key, params) {
+    if (!editingCell.value) return;
+    const param = params[key];
+    if (!param || typeof param !== 'object') { cancelEdit(); return; }
+
+    const original = getCellValue(params, key);
+    const newValue = editingValue.value;
+    cancelEdit();
+
+    if (newValue === String(original ?? '')) return;
+
+    try {
+        const id = unitCode.split(':')[0];
+        await axios.post('/update', { db: param.db, id, key: param.id, value: newValue });
+        param.value = newValue;
+    } catch (e) {
+        console.error('Failed to save', e);
     }
 }
 

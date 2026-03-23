@@ -46,9 +46,10 @@ class JsonController extends Controller
         $jsonDataW3uSkin = json_decode(file_get_contents($w3uSkinJson), true);
         $jsonDataWts = json_decode(file_get_contents($wtsJson), true);
 
-        $unitsW3u = array_merge($jsonDataW3u['original'] ?? [], $jsonDataW3u['custom'] ?? []);
-        $unitsW3uSkin = array_merge($jsonDataW3uSkin['original'] ?? [], $jsonDataW3uSkin['custom'] ?? []);
-        $allUnits = array_merge_recursive($unitsW3u, $unitsW3uSkin);
+        $sources = [
+            'war3map.w3u.json'     => array_merge($jsonDataW3u['original'] ?? [],     $jsonDataW3u['custom'] ?? []),
+            'war3mapSkin.w3u.json' => array_merge($jsonDataW3uSkin['original'] ?? [], $jsonDataW3uSkin['custom'] ?? []),
+        ];
 
         $tags = JsonService::mapTags();
         $wtsMapping = $jsonDataWts ?? [];
@@ -57,35 +58,38 @@ class JsonController extends Controller
         $parsedUnits = [];
         $blpService = new BlpConverterService();
 
-        foreach ($allUnits as $unitCode => $paramsList) {
-            foreach ($paramsList as $param) {
-                // Заменяем TRIGSTR_ на значение из WTS
-                if (preg_match('/^TRIGSTR_(\d+)$/', $param['value'], $matches)) {
-                    $key = $matches[1];
-                    $param['value'] = $wtsMapping[$key] ?? $param['value'];
-                }
+        foreach ($sources as $db => $unitsList) {
+            foreach ($unitsList as $unitCode => $paramsList) {
+                foreach ($paramsList as $param) {
+                    // Заменяем TRIGSTR_ на значение из WTS
+                    if (preg_match('/^TRIGSTR_(\d+)$/', $param['value'], $matches)) {
+                        $key = $matches[1];
+                        $param['value'] = $wtsMapping[$key] ?? $param['value'];
+                    }
 
-                // Стандартный параметр
-                $paramKey = $idMapping[$param['id']] ?? $param['id'];
-                $parsedUnits[$unitCode][$paramKey] = [
-                    'name'  => $paramKey,
-                    'value' => $param['value'],
-                    'type'  => $param['type'],
-                    'level' => $param['level'],
-                    'column'=> $param['column'],
-                ];
+                    // Стандартный параметр
+                    $paramKey = $idMapping[$param['id']] ?? $param['id'];
+                    $parsedUnits[$unitCode][$paramKey] = [
+                        'id'    => $param['id'],
+                        'db'    => $db,
+                        'name'  => $paramKey,
+                        'value' => $param['value'],
+                        'type'  => $param['type'],
+                        'level' => $param['level'],
+                        'column'=> $param['column'],
+                    ];
 
-                // Если это uico — создаем новое поле uico_png
-                if ($param['id'] === 'uico' && !empty($param['value'])) {
-                    $blpPath = $path . DIRECTORY_SEPARATOR . $param['value'];
-                    try {
-                        $pngPath = file_exists($blpPath) ? $blpService->convertToStorage($blpPath, 'png') : null;
-                        // Сохраняем относительный путь для Blade
-                        $parsedUnits[$unitCode]['uico_png'] = $pngPath
-                            ? str_replace(storage_path('app/public') . '/', '', $pngPath)
-                            : null;
-                    } catch (\Exception $e) {
-                        $parsedUnits[$unitCode]['uico_png'] = null;
+                    // Если это uico — создаем новое поле uico_png
+                    if ($param['id'] === 'uico' && !empty($param['value'])) {
+                        $blpPath = $path . DIRECTORY_SEPARATOR . $param['value'];
+                        try {
+                            $pngPath = file_exists($blpPath) ? $blpService->convertToStorage($blpPath, 'png') : null;
+                            $parsedUnits[$unitCode]['uico_png'] = $pngPath
+                                ? str_replace(storage_path('app/public') . '/', '', $pngPath)
+                                : null;
+                        } catch (\Exception $e) {
+                            $parsedUnits[$unitCode]['uico_png'] = null;
+                        }
                     }
                 }
             }
