@@ -41,14 +41,14 @@
 
             <!-- Table -->
             <div class="overflow-x-auto rounded-lg border border-gray-700">
-                <table class="w-full text-sm text-left">
-                    <thead class="bg-gray-800 text-yellow-300 text-xs uppercase">
+                <table class="w-full text-xs text-left border-collapse">
+                    <thead class="bg-gray-800 text-yellow-300 uppercase sticky top-0">
                         <tr>
-                            <th class="px-3 py-2 border-b border-gray-700 whitespace-nowrap">Unit</th>
+                            <th class="px-2 py-1 border border-gray-700 w-16 min-w-[3rem] break-words">Unit</th>
                             <th
                                 v-for="key in allKeys"
                                 :key="key"
-                                class="px-3 py-2 border-b border-gray-700 whitespace-nowrap"
+                                class="px-2 py-1 border border-gray-700 min-w-[4rem] max-w-[8rem] break-words leading-tight font-medium"
                             >
                                 {{ key }}
                             </th>
@@ -58,21 +58,21 @@
                         <tr
                             v-for="(params, unitCode) in filteredUnits"
                             :key="unitCode"
-                            class="border-b border-gray-800 hover:bg-gray-800 transition-colors"
+                            class="hover:bg-gray-800 transition-colors"
                         >
-                            <td class="px-3 py-2 font-mono font-semibold text-yellow-200 whitespace-nowrap">
+                            <td class="px-2 py-1 border border-gray-700/50 font-mono font-semibold text-yellow-200 whitespace-nowrap">
                                 {{ unitCode }}
                             </td>
                             <td
                                 v-for="key in allKeys"
                                 :key="key"
-                                class="px-3 py-2 text-gray-300 max-w-xs truncate"
+                                class="px-2 py-1 border border-gray-700/50 text-gray-300 break-words"
                             >
                                 <template v-if="key === 'uico_png' && getCellValue(params, key)">
                                     <img
                                         :src="'/storage/png/' + getCellValue(params, key)"
                                         :alt="unitCode"
-                                        class="w-12 h-12 object-contain"
+                                        class="w-10 h-10 object-contain"
                                     >
                                 </template>
                                 <template v-else>
