@@ -4,14 +4,22 @@
             <h1 class="text-2xl font-bold text-yellow-400">Units</h1>
             <button
                 @click="parseMap"
-                :disabled="parsing"
+                :disabled="parsing || building"
                 class="px-3 py-1 rounded text-sm font-medium transition-colors bg-gray-700 hover:bg-gray-600 text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 {{ parsing ? 'Parsing...' : 'Parse Map' }}
             </button>
-            <span v-if="parseResult !== null" :class="parseResult.success ? 'text-green-400' : 'text-red-400'" class="text-sm">
-                {{ parseResult.success ? 'Done' : 'Error' }}
-                <span v-if="parseResult.output" class="text-gray-400 ml-1">— {{ parseResult.output }}</span>
+            <button
+                @click="buildMap"
+                :disabled="parsing || building"
+                class="px-3 py-1 rounded text-sm font-medium transition-colors bg-gray-700 hover:bg-gray-600 text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                {{ building ? 'Building...' : 'Build Map' }}
+            </button>
+            <span v-if="actionResult !== null" :class="actionResult.success ? 'text-green-400' : 'text-red-400'" class="text-sm">
+                {{ actionResult.success ? 'Done' : 'Error' }}
+                <span v-if="actionResult.output" class="text-gray-400 ml-1">— {{ actionResult.output }}</span>
+                <span v-if="actionResult.log" class="text-gray-400 ml-1">— {{ JSON.stringify(actionResult.log) }}</span>
             </span>
         </div>
 
@@ -111,7 +119,8 @@ const vFocus = { mounted: (el) => el.focus() };
 
 const loading = ref(true);
 const parsing = ref(false);
-const parseResult = ref(null);
+const building = ref(false);
+const actionResult = ref(null);
 const units = ref({});
 const tags = ref([]);
 const allKeys = ref([]);
@@ -144,14 +153,27 @@ const filteredUnits = computed(() => {
 
 async function parseMap() {
     parsing.value = true;
-    parseResult.value = null;
+    actionResult.value = null;
     try {
         const { data } = await axios.get('/parse-map');
-        parseResult.value = data;
+        actionResult.value = data;
     } catch (e) {
-        parseResult.value = { success: false, output: e?.response?.data?.message ?? 'Request failed' };
+        actionResult.value = { success: false, output: e?.response?.data?.message ?? 'Request failed' };
     } finally {
         parsing.value = false;
+    }
+}
+
+async function buildMap() {
+    building.value = true;
+    actionResult.value = null;
+    try {
+        const { data } = await axios.get('/build-map');
+        actionResult.value = data;
+    } catch (e) {
+        actionResult.value = { success: false, output: e?.response?.data?.message ?? 'Request failed' };
+    } finally {
+        building.value = false;
     }
 }
 

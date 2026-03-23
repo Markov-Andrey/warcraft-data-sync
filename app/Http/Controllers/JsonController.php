@@ -26,6 +26,27 @@ class JsonController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function buildMap()
+    {
+        $path = PathService::getParentProjectPath();
+
+        $files = ['war3map.w3u', 'war3mapSkin.w3u', 'war3map.wts'];
+
+        $log = [];
+        foreach ($files as $file) {
+            $bin  = $path . DIRECTORY_SEPARATOR . $file;
+            $json = $bin . '.json';
+            if (file_exists($json)) {
+                $output = MapConverterService::convertToWar($json, $json);
+                $log[$file] = trim($output);
+            } else {
+                $log[$file] = 'json not found: ' . $json;
+            }
+        }
+
+        return response()->json(['success' => true, 'log' => $log]);
+    }
+
     public function units(Request $request)
     {
         $path = PathService::getParentProjectPath();

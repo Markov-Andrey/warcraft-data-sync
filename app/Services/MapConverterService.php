@@ -28,4 +28,11 @@ class MapConverterService
 
         shell_exec($command);
     }
+
+    public static function convertToWar(string $inputPath, string $outputPath): string
+    {
+        $command = "npx patchwork-mapconverter json2war \"$inputPath\" \"$outputPath\" 2>&1";
+
+        return shell_exec($command) ?? '';
+    }
 }
