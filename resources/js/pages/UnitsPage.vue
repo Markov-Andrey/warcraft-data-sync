@@ -205,7 +205,7 @@ async function saveEdit(unitCode, key, params) {
 
     try {
         const id = unitCode.split(':')[0];
-        await axios.post('/update', { db: param.db, id, key: param.id, value: newValue });
+        await axios.post('/update', { db: param.db, id, key: param.id, value: newValue, type: param.type });
         param.value = newValue;
     } catch (e) {
         console.error('Failed to save', e);

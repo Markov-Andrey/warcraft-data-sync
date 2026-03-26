@@ -23,5 +23,6 @@ Route::post('/update', function (Request $request) {
         $request->input('id'),
         $request->input('key'),
         $request->input('value'),
+        $request->input('type', 'string'),
     );
 });

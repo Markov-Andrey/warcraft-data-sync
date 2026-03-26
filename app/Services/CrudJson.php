@@ -4,8 +4,14 @@ namespace App\Services;
 
 class CrudJson
 {
-    // TODO есть проблема, нужно создавать поле когда его нет в json и важен тип "int" - число, и "unreal" - float, а значение храни без кавычек если это реально числа. вот пример - {"id":"ua1s","type":"int","level":0,"column":0,"value":21},{"id":"ua1r","type":"int","level":0,"column":0,"value":1150}. а структура json {"original":{"uplg":[{"id":"uabi","type":"string","level":0,"column":0,"value":"Aap2,A01A"}]},"custom":{"U006:Uear":[{"id":"udup","type":"int","level":0,"column":0,"value":1},{"id":"uhab","type":"string","level":0,"column":0,"value":"A018,A021,A01B,A0A8"},{"id":"ubld","type":"int",
-    public static function updateValue($db, $id, $key, $value)
+    private static function castValue($value, string $type)
+    {
+        if ($type === 'int') return (int) $value;
+        if ($type === 'unreal' || $type === 'real') return (float) $value;
+        return (string) $value;
+    }
+
+    public static function updateValue($db, $id, $key, $value, $type = 'string')
     {
         try {
             $dbFile = PathService::getParentProjectPath() . '/' . $db;
@@ -33,14 +39,20 @@ class CrudJson
 
             foreach ($unitData as &$field) {
                 if ($field['id'] === $key) {
-                    $field['value'] = $value;
+                    $field['value'] = self::castValue($value, $field['type']);
                     $foundField = true;
                     break;
                 }
             }
 
             if (!$foundField) {
-                throw new \Exception("Field with key '$key' not found.");
+                $unitData[] = [
+                    'id' => $key,
+                    'type' => $type,
+                    'level' => 0,
+                    'column' => 0,
+                    'value' => self::castValue($value, $type),
+                ];
             }
 
             file_put_contents($dbFile, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
