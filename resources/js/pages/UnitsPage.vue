@@ -50,8 +50,8 @@
                 <table class="w-full text-xs text-left border-collapse">
                     <thead class="bg-gray-800 text-yellow-300 uppercase sticky top-0 z-20">
                         <tr>
-                            <th class="sticky left-0 z-20 bg-gray-800 px-2 py-1 border border-gray-700 w-16 min-w-[4rem] whitespace-nowrap">Unit</th>
-                            <th class="sticky left-16 z-20 bg-gray-800 px-2 py-1 border border-gray-700 w-12 min-w-[3rem] text-center">Icon</th>
+                            <th class="sticky left-0 z-20 bg-gray-800 px-2 py-1 border border-gray-700 w-16 min-w-[4rem] whitespace-nowrap [box-shadow:2px_0_0_0_#ca8a04]">Unit</th>
+                            <th class="sticky left-16 z-20 bg-gray-800 px-2 py-1 border border-gray-700 w-12 min-w-[3rem] text-center [box-shadow:2px_0_0_0_#ca8a04]">Icon</th>
                             <th
                                 v-for="key in dynamicKeys"
                                 :key="key"
@@ -67,10 +67,10 @@
                             :key="unitCode"
                             class="hover:bg-gray-750 transition-colors"
                         >
-                            <td class="sticky left-0 z-10 bg-gray-900 px-2 py-1 border border-gray-700/50 font-mono font-semibold text-yellow-200 whitespace-nowrap">
+                            <td class="sticky left-0 z-10 bg-gray-900 px-2 py-1 border border-gray-700/50 font-mono font-semibold text-yellow-200 whitespace-nowrap [box-shadow:2px_0_0_0_#ca8a04]">
                                 {{ unitCode }}
                             </td>
-                            <td class="sticky left-16 z-10 bg-gray-900 px-1 py-1 border border-gray-700/50 text-center">
+                            <td class="sticky left-16 z-10 bg-gray-900 px-1 py-1 border border-gray-700/50 text-center [box-shadow:2px_0_0_0_#ca8a04]">
                                 <img
                                     v-if="getCellValue(params, 'uico_png')"
                                     :src="'/storage/png/' + getCellValue(params, 'uico_png')"
