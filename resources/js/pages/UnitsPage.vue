@@ -194,8 +194,6 @@ function cancelEdit() {
 
 async function saveEdit(unitCode, key, params) {
     if (!editingCell.value) return;
-    const param = params[key];
-    if (!param || typeof param !== 'object') { cancelEdit(); return; }
 
     const original = getCellValue(params, key);
     const newValue = editingValue.value;
@@ -203,10 +201,25 @@ async function saveEdit(unitCode, key, params) {
 
     if (newValue === String(original ?? '')) return;
 
+    const param = params[key];
+    const id = unitCode.split(':')[0];
+
+    // Find db from any existing param of this unit
+    const anyParam = param ?? Object.values(params).find(p => p && typeof p === 'object' && p.db);
+
+    if (!anyParam) return;
+
+    const fieldId = param?.id ?? key;
+    const fieldType = param?.type ?? 'string';
+
     try {
-        const id = unitCode.split(':')[0];
-        await axios.post('/update', { db: param.db, id, key: param.id, value: newValue, type: param.type });
-        param.value = newValue;
+        await axios.post('/update', { db: anyParam.db, id, key: fieldId, value: newValue, type: fieldType });
+        if (param && typeof param === 'object') {
+            param.value = newValue;
+        } else {
+            // Create local param entry so the cell shows the new value
+            params[key] = { id: fieldId, db: anyParam.db, name: key, value: newValue, type: fieldType, level: 0, column: 0 };
+        }
     } catch (e) {
         console.error('Failed to save', e);
     }

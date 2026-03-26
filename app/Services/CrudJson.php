@@ -11,6 +11,13 @@ class CrudJson
         return (string) $value;
     }
 
+    private static function detectType($value): string
+    {
+        if (is_numeric($value) && strpos((string) $value, '.') !== false) return 'unreal';
+        if (is_numeric($value) && strpos((string) $value, '.') === false) return 'int';
+        return 'string';
+    }
+
     public static function updateValue($db, $id, $key, $value, $type = 'string')
     {
         try {
@@ -22,6 +29,7 @@ class CrudJson
                 throw new \Exception("Failed to decode JSON data.");
             }
 
+            // Search in custom (keys like "U006:Uear")
             $unitKeyFound = null;
             foreach ($data['custom'] as $unitKey => $unitData) {
                 if (strpos($unitKey, $id . ":") === 0) {
@@ -30,11 +38,17 @@ class CrudJson
                 }
             }
 
-            if (!$unitKeyFound) {
+            if ($unitKeyFound !== null) {
+                $section = 'custom';
+                $sectionKey = $unitKeyFound;
+            } elseif (isset($data['original'][$id])) {
+                $section = 'original';
+                $sectionKey = $id;
+            } else {
                 throw new \Exception("Unit with id '$id' not found in the data.");
             }
 
-            $unitData = &$data['custom'][$unitKeyFound];
+            $unitData = &$data[$section][$sectionKey];
             $foundField = false;
 
             foreach ($unitData as &$field) {
@@ -46,12 +60,13 @@ class CrudJson
             }
 
             if (!$foundField) {
+                $detectedType = self::detectType($value);
                 $unitData[] = [
                     'id' => $key,
-                    'type' => $type,
+                    'type' => $detectedType,
                     'level' => 0,
                     'column' => 0,
-                    'value' => self::castValue($value, $type),
+                    'value' => self::castValue($value, $detectedType),
                 ];
             }
 
