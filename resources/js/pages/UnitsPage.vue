@@ -85,12 +85,13 @@
                                 @dblclick="startEdit(unitCode, key, params)"
                             >
                                 <template v-if="isEditing(unitCode, key)">
-                                    <input
+                                    <textarea
                                         v-model="editingValue"
                                         @blur="saveEdit(unitCode, key, params)"
-                                        @keyup.enter="saveEdit(unitCode, key, params)"
                                         @keyup.escape="cancelEdit"
-                                        class="w-full bg-gray-900 border border-yellow-500 text-gray-100 px-1 py-0 text-xs rounded outline-none"
+                                        @keydown.enter.exact.prevent="saveEdit(unitCode, key, params)"
+                                        class="w-full bg-gray-900 border border-yellow-500 text-gray-100 px-1 py-0 text-xs rounded outline-none resize-y min-h-[3rem]"
+                                        rows="3"
                                         v-focus
                                     />
                                 </template>
