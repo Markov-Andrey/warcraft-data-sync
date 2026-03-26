@@ -48,11 +48,12 @@
             <!-- Table -->
             <div class="overflow-x-auto rounded-lg border border-gray-700">
                 <table class="w-full text-xs text-left border-collapse">
-                    <thead class="bg-gray-800 text-yellow-300 uppercase sticky top-0">
+                    <thead class="bg-gray-800 text-yellow-300 uppercase sticky top-0 z-20">
                         <tr>
-                            <th class="px-2 py-1 border border-gray-700 w-16 min-w-[3rem] break-words">Unit</th>
+                            <th class="sticky left-0 z-20 bg-gray-800 px-2 py-1 border border-gray-700 w-16 min-w-[4rem] whitespace-nowrap">Unit</th>
+                            <th class="sticky left-16 z-20 bg-gray-800 px-2 py-1 border border-gray-700 w-12 min-w-[3rem] text-center">Icon</th>
                             <th
-                                v-for="key in allKeys"
+                                v-for="key in dynamicKeys"
                                 :key="key"
                                 class="px-2 py-1 border border-gray-700 min-w-[4rem] max-w-[8rem] break-words leading-tight font-medium"
                             >
@@ -64,17 +65,24 @@
                         <tr
                             v-for="(params, unitCode) in filteredUnits"
                             :key="unitCode"
-                            class="hover:bg-gray-800 transition-colors"
+                            class="hover:bg-gray-750 transition-colors"
                         >
-                            <td class="px-2 py-1 border border-gray-700/50 font-mono font-semibold text-yellow-200 whitespace-nowrap">
+                            <td class="sticky left-0 z-10 bg-gray-900 px-2 py-1 border border-gray-700/50 font-mono font-semibold text-yellow-200 whitespace-nowrap">
                                 {{ unitCode }}
                             </td>
+                            <td class="sticky left-16 z-10 bg-gray-900 px-1 py-1 border border-gray-700/50 text-center">
+                                <img
+                                    v-if="getCellValue(params, 'uico_png')"
+                                    :src="'/storage/png/' + getCellValue(params, 'uico_png')"
+                                    :alt="unitCode"
+                                    class="w-10 h-10 object-contain mx-auto"
+                                >
+                            </td>
                             <td
-                                v-for="key in allKeys"
+                                v-for="key in dynamicKeys"
                                 :key="key"
-                                class="px-2 py-1 border border-gray-700/50 text-gray-300 break-words"
-                                :class="{ 'cursor-pointer select-none': key !== 'uico_png' }"
-                                @dblclick="key !== 'uico_png' && startEdit(unitCode, key, params)"
+                                class="px-2 py-1 border border-gray-700/50 text-gray-300 break-words cursor-pointer select-none"
+                                @dblclick="startEdit(unitCode, key, params)"
                             >
                                 <template v-if="isEditing(unitCode, key)">
                                     <input
@@ -86,20 +94,13 @@
                                         v-focus
                                     />
                                 </template>
-                                <template v-else-if="key === 'uico_png' && getCellValue(params, key)">
-                                    <img
-                                        :src="'/storage/png/' + getCellValue(params, key)"
-                                        :alt="unitCode"
-                                        class="w-10 h-10 object-contain"
-                                    >
-                                </template>
                                 <template v-else>
                                     {{ getCellValue(params, key) }}
                                 </template>
                             </td>
                         </tr>
                         <tr v-if="!Object.keys(filteredUnits).length">
-                            <td :colspan="allKeys.length + 1" class="px-3 py-6 text-center text-gray-500 italic">
+                            <td :colspan="dynamicKeys.length + 2" class="px-3 py-6 text-center text-gray-500 italic">
                                 No units found
                             </td>
                         </tr>
@@ -136,6 +137,8 @@ onMounted(async () => {
         loading.value = false;
     }
 });
+
+const dynamicKeys = computed(() => allKeys.value.filter(k => k !== 'uico_png'));
 
 const filteredUnits = computed(() => {
     if (!activeLegend.value) return units.value;
