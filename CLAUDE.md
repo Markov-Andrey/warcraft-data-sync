@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Rules
+
+- **Never create git commits or push unless the user explicitly asks.**
+
 ## Project Overview
 
 **WarCraft Data Sync** is a Laravel-based web UI for managing Warcraft III map projects. It synchronizes files from a parent `.w3x` map project to dependent child projects, handles file filtering/replacement rules, and compiles child projects into `.w3x` archives using an external MPQ editor tool.
