@@ -22,6 +22,12 @@ class FileProcessorService
             $w3xConst['exceptions'] ?? []
         );
 
+        // Все individual пути по всем детям — для использования в очистке
+        $allIndividual = array_unique(array_map(
+            fn($p) => str_replace('\\', '/', $p),
+            array_merge(...array_values(array_map(fn($p) => $p['individual'] ?? [], $childProjects)))
+        ));
+
         foreach (File::allFiles($parentProjectPath) as $file) {
             $relativePath = str_replace($parentProjectPath . DIRECTORY_SEPARATOR, '', $file->getRealPath());
             $normalizedRelative = str_replace('\\', '/', $relativePath);
@@ -52,9 +58,98 @@ class FileProcessorService
             }
         }
 
+        // Чистим мусор в каждом child
+        foreach ($childProjects as $project) {
+            $myIndividual = array_map(
+                fn($p) => str_replace('\\', '/', $p),
+                $project['individual'] ?? []
+            );
+            self::cleanChildProject($project['path'], $parentProjectPath, $excluded, $myIndividual, $allIndividual);
+        }
+
         InfoConfigService::lastSync();
 
         return true;
+    }
+
+    /**
+     * Удалить из child файлы и пустые директории если:
+     * - файла нет в parent, ИЛИ
+     * - файл есть в allIndividual но не в myIndividual (чужой индивидуальный)
+     * Не трогать: excluded и myIndividual
+     */
+    private static function cleanChildProject(
+        string $childPath,
+        string $parentPath,
+        array $excluded,
+        array $myIndividual,
+        array $allIndividual
+    ): void {
+        foreach (File::allFiles($childPath) as $file) {
+            $relativePath = str_replace($childPath . DIRECTORY_SEPARATOR, '', $file->getRealPath());
+            $normalizedRelative = str_replace('\\', '/', $relativePath);
+
+            // Защищаем: excluded и myIndividual
+            $isProtected = false;
+            foreach (array_merge($excluded, $myIndividual) as $item) {
+                $normalizedItem = str_replace('\\', '/', $item);
+                if ($normalizedRelative === $normalizedItem
+                    || str_starts_with($normalizedRelative, rtrim($normalizedItem, '/') . '/')) {
+                    $isProtected = true;
+                    break;
+                }
+            }
+
+            if ($isProtected) {
+                continue;
+            }
+
+            // Удаляем если чужой individual или файла нет в parent
+            $isForeignIndividual = false;
+            foreach ($allIndividual as $item) {
+                if ($normalizedRelative === $item
+                    || str_starts_with($normalizedRelative, rtrim($item, '/') . '/')) {
+                    $isForeignIndividual = true;
+                    break;
+                }
+            }
+
+            if ($isForeignIndividual || !File::exists($parentPath . DIRECTORY_SEPARATOR . $relativePath)) {
+                File::delete($file->getRealPath());
+            }
+        }
+
+        // Удаляем пустые директории (кроме защищённых)
+        foreach (File::directories($childPath) as $dir) {
+            $relativeDirName = str_replace('\\', '/', str_replace($childPath . DIRECTORY_SEPARATOR, '', $dir));
+
+            $isProtected = false;
+            foreach (array_merge($excluded, $myIndividual) as $item) {
+                $normalizedItem = str_replace('\\', '/', $item);
+                if ($relativeDirName === $normalizedItem || str_starts_with($relativeDirName, rtrim($normalizedItem, '/') . '/')) {
+                    $isProtected = true;
+                    break;
+                }
+            }
+
+            if (!$isProtected) {
+                self::deleteEmptyDirectories($dir);
+            }
+        }
+    }
+
+    /**
+     * Рекурсивно удалить пустые директории снизу вверх
+     */
+    private static function deleteEmptyDirectories(string $dir): void
+    {
+        foreach (File::directories($dir) as $subDir) {
+            self::deleteEmptyDirectories($subDir);
+        }
+
+        if (empty(File::files($dir)) && empty(File::directories($dir))) {
+            File::deleteDirectory($dir);
+        }
     }
 
     protected static function processWar3MapJ(string $sourceFile, string $targetFile): void
@@ -162,6 +257,7 @@ class FileProcessorService
      */
     public static function copyFilesRecursive($sourceDir, $targetDir): void
     {
+        $sourceDir = realpath($sourceDir) ?: $sourceDir;
         $files = File::allFiles($sourceDir);
 
         foreach ($files as $file) {
