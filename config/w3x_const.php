@@ -1,6 +1,7 @@
 <?php
 
 return [
+    // Unique individual map files
     'copy' => [
         'war3map.w3e', // terrain texturing
         'war3map.shd', // shadow map
@@ -15,6 +16,7 @@ return [
         'war3map.w3s', // Sounds are set
         'FullScreen.blp', // Map preview screen
     ],
+    // Technical files
     'exceptions' => [
         '.data-sync',
         'war3map.w3u.json',

@@ -20,7 +20,6 @@ class IndexPage extends Controller
     {
         $parentProjectPath = PathService::getParentProjectPath();
 
-        $this->configService->initializeConfig();
         $configInfo = $this->configService->loadConfigInfo();
         $copyFiles = collect(config('w3x_const.copy'))
             ->map(fn($path) => basename($path))

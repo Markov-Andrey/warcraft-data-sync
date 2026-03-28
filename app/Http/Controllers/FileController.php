@@ -3,19 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Services\BuildGameService;
-use App\Services\ConfigService;
 use App\Services\FileProcessorService;
 use App\Services\InfoConfigService;
 use Illuminate\Http\Request;
 
 class FileController extends Controller
 {
-    protected ConfigService $configService;
-
-    public function __construct(ConfigService $configService)
-    {
-        $this->configService = $configService;
-    }
     public function copyChild()
     {
         $updated = FileProcessorService::copyChildFiles();

@@ -2,52 +2,56 @@
 
 namespace App\Services;
 
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 class FileProcessorService
 {
     /**
-     * Копировать файлы дочерним проектам согласно конфигу (copy,copy_child)
-     * @return bool
+     * Копировать файлы из parent во все child-проекты,
+     * пропуская файлы из w3x_const['copy'] и w3x_const['exceptions']
      */
     public static function copyChildFiles(): bool
     {
-        $configPath = PathService::getConfigFilePath();
-        $child_projects = PathService::getChildProject();
+        $childProjects = PathService::getChildProject();
         $parentProjectPath = PathService::getParentProjectPath();
-        $config = json_decode(File::get($configPath), true);
+        $w3xConst = config('w3x_const');
 
-        foreach ($child_projects as $key => $project) {
-            foreach ($config as $item) {
-                $allowedProjects = array_map('trim', explode(',', $item['copy_child']));
-                $isAllowed = ($item['copy_child'] === '') || in_array($project['name'], $allowedProjects);
+        $excluded = array_merge(
+            $w3xConst['copy'] ?? [],
+            $w3xConst['exceptions'] ?? []
+        );
 
-                if ($item['copy'] && $isAllowed) {
-                    $targetPath = $project['path'] . DIRECTORY_SEPARATOR . $item['path'];
+        foreach (File::allFiles($parentProjectPath) as $file) {
+            $relativePath = str_replace($parentProjectPath . DIRECTORY_SEPARATOR, '', $file->getRealPath());
+            $normalizedRelative = str_replace('\\', '/', $relativePath);
 
-                    if ($item['type'] === 'directory') {
-                        if (!File::exists($targetPath)) {
-                            File::makeDirectory($targetPath, 0777, true);
-                        }
-                        FileProcessorService::copyFilesRecursive($parentProjectPath . DIRECTORY_SEPARATOR . $item['path'], $targetPath);
-                    } elseif ($item['type'] === 'file') {
-                        $sourceFile = $parentProjectPath . DIRECTORY_SEPARATOR . $item['path'];
-                        $targetDir = dirname($targetPath);
-                        if (!File::exists($targetDir)) {
-                            File::makeDirectory($targetDir, 0777, true);
-                        }
-                        File::copy($sourceFile, $targetPath);
-
-                        if (basename($targetPath) === 'war3map.j') {
-                            // self::processWar3MapJ($sourceFile, $targetPath); // TODO тут логика словить содержимое и грамотно смержить и заменить переменные, чтобы не пересохранять код заново
-                        }
-                    }
+            $isExcluded = false;
+            foreach ($excluded as $item) {
+                if ($file->getFilename() === $item
+                    || $normalizedRelative === $item
+                    || str_starts_with($normalizedRelative, $item . '/')) {
+                    $isExcluded = true;
+                    break;
                 }
             }
+
+            if ($isExcluded) {
+                continue;
+            }
+
+            foreach ($childProjects as $project) {
+                $targetPath = $project['path'] . DIRECTORY_SEPARATOR . $relativePath;
+                $targetDir = dirname($targetPath);
+
+                if (!File::exists($targetDir)) {
+                    File::makeDirectory($targetDir, 0777, true);
+                }
+
+                File::copy($file->getRealPath(), $targetPath);
+            }
         }
+
         InfoConfigService::lastSync();
 
         return true;
