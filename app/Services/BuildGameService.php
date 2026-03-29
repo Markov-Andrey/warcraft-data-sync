@@ -68,6 +68,7 @@ class BuildGameService
         $this->removeExcludedFiles($tmpDir);
         $this->removeForeignUniqueFiles($tmpDir, $childKey);
         $this->processWtsFile($tmpDir);
+        $this->processW3iFile($tmpDir, $project);
         $this->processJassFile($tmpDir, $project);
         $this->createMpq($tmpDir, $mpqFileName);
 
@@ -141,6 +142,52 @@ class BuildGameService
 
         shell_exec(escapeshellcmd("$this->mpqPath compact " . escapeshellarg($mpqFileName)));
         shell_exec(escapeshellcmd("$this->mpqPath close " . escapeshellarg($mpqFileName)));
+    }
+
+    /**
+     * Patch war3map.w3i with project metadata from config
+     */
+    private function processW3iFile(string $tmpDir, array $project): void
+    {
+        $w3iPath = $tmpDir . DIRECTORY_SEPARATOR . 'war3map.w3i';
+        if (!File::exists($w3iPath)) {
+            return;
+        }
+
+        $jsonPath = $w3iPath . '.json';
+        MapConverterService::convertToJson($w3iPath, $w3iPath);
+
+        $info = $project['info'] ?? [];
+        $json = json_decode(file_get_contents($jsonPath), true);
+
+        foreach ($info['map'] ?? [] as $key => $value) {
+            $json['map'][$key] = $value;
+        }
+
+        foreach ($info['players'] ?? [] as $i => $player) {
+            if (isset($json['players'][$i])) {
+                $json['players'][$i]['name'] = $player['name'];
+            }
+        }
+
+        foreach ($info['forces'] ?? [] as $i => $force) {
+            if (isset($json['forces'][$i])) {
+                $json['forces'][$i]['name'] = $force['name'];
+            }
+        }
+
+        file_put_contents($jsonPath, json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        MapConverterService::convertToWar($jsonPath, $w3iPath);
+
+        $toolOutput = $tmpDir . DIRECTORY_SEPARATOR . pathinfo($w3iPath, PATHINFO_FILENAME);
+        if (file_exists($toolOutput)) {
+            if (file_exists($w3iPath)) {
+                unlink($w3iPath);
+            }
+            rename($toolOutput, $w3iPath);
+        }
+
+        File::delete($jsonPath);
     }
 
     /**
