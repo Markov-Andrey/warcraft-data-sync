@@ -68,6 +68,7 @@ class BuildGameService
         $this->removeExcludedFiles($tmpDir);
         $this->removeForeignUniqueFiles($tmpDir, $childKey);
         $this->processWtsFile($tmpDir);
+        $this->processJassFile($tmpDir, $project);
         $this->createMpq($tmpDir, $mpqFileName);
 
         File::deleteDirectory($tmpDir);
@@ -140,6 +141,25 @@ class BuildGameService
 
         shell_exec(escapeshellcmd("$this->mpqPath compact " . escapeshellarg($mpqFileName)));
         shell_exec(escapeshellcmd("$this->mpqPath close " . escapeshellarg($mpqFileName)));
+    }
+
+    /**
+     * Patch war3map.j — replace udg_Map with project key
+     */
+    private function processJassFile(string $tmpDir, array $project): void
+    {
+        $jassFile = $tmpDir . DIRECTORY_SEPARATOR . 'war3map.j';
+        if (!File::exists($jassFile)) {
+            return;
+        }
+
+        $content = File::get($jassFile);
+        $content = preg_replace(
+            '/set udg_Map="[^"]*"/',
+            'set udg_Map="' . $project['key'] . '"',
+            $content
+        );
+        File::put($jassFile, $content);
     }
 
     /**
