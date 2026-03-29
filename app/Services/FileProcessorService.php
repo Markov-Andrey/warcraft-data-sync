@@ -152,124 +152,54 @@ class FileProcessorService
         }
     }
 
-    protected static function processWar3MapJ(string $sourceFile, string $targetFile): void
-    {
-        $parentContent = File::get($sourceFile);
-        $childContent = File::get($targetFile);
-
-        $keyBlocks = [
-            'Main Initialization',
-            'Players',
-            'Map Configuration',
-        ];
-
-        // Разбиваем содержимое на строки
-        $childLines = explode("\n", $childContent);
-        $parentLines = explode("\n", $parentContent);
-
-        $mergedLines = [];
-        $collectingKey = null;
-
-        // Пройдем по родителю и вставляем его ключевые блоки только если ребенок пустой
-        foreach ($parentLines as $line) {
-            foreach ($keyBlocks as $key) {
-                if (strpos($line, $key) !== false) {
-                    $collectingKey = $key;
-                    break;
-                }
-            }
-
-            if ($collectingKey !== null) {
-                // Проверяем, есть ли блок в ребенке
-                $childBlockStart = null;
-                $childBlockLines = [];
-                $insideChildBlock = false;
-
-                foreach ($childLines as $childLine) {
-                    if (strpos($childLine, $collectingKey) !== false) {
-                        $insideChildBlock = true;
-                    }
-
-                    if ($insideChildBlock) {
-                        $childBlockLines[] = $childLine;
-                        // Конец блока: следующий ключ или конец файла
-                        foreach ($keyBlocks as $key2) {
-                            if ($key2 !== $collectingKey && strpos($childLine, $key2) !== false) {
-                                $insideChildBlock = false;
-                            }
-                        }
-                    }
-                }
-
-                // Если блок ребенка пустой — вставляем блок родителя
-                if (empty(trim(implode("\n", $childBlockLines)))) {
-                    $mergedLines[] = $line;
-                } else {
-                    $mergedLines = array_merge($mergedLines, $childBlockLines);
-                }
-
-                $collectingKey = null;
-                continue;
-            }
-
-            // Остальные строки родителя просто добавляем
-            $mergedLines[] = $line;
-        }
-
-        $mergedContent = implode("\n", $mergedLines);
-
-        Log::info($mergedContent);
-        // File::put($targetFile, $mergedContent);
-    }
-
     /**
-     * Обрабатываем файл в проекте с применением паттернов замены
-     */
-    public static function processFileWithPatterns(array $patterns, string $filePath, array $project): void
-    {
-        $content = File::get($filePath);
-
-        $replacements = [
-            ':project_name' => $project['name'],
-            ':project_key' => $project['key'],
-            ':description' => $project['description'],
-            ':type_game' => $project['type_game'],
-        ];
-
-        foreach ($patterns as $file => $filePatterns) {
-            if ($file === basename($filePath)) {
-                foreach ($filePatterns as $pattern => $replacement) {
-                    foreach ($replacements as $key => $value) {
-                        if (str_contains($replacement, $key)) {
-                            $replacement = str_replace($key, $value, $replacement);
-                        }
-                    }
-                    $content = preg_replace($pattern, $replacement, $content);
-                }
-            }
-        }
-
-        File::put($filePath, $content);
-    }
-    /**
-     * Рекурсия, если директория показана к полному копированию
+     * Обмен данных из инфо карты
+     *
+     * @param string $childW3iPath
+     * @param string $parentW3iPath
+     * @param array $projectData
      * @return void
      */
-    public static function copyFilesRecursive($sourceDir, $targetDir): void
+    private static function patchMapInfo(string $childW3iPath, string $parentW3iPath, array $projectData): void
     {
-        $sourceDir = realpath($sourceDir) ?: $sourceDir;
-        $files = File::allFiles($sourceDir);
+        copy($childW3iPath, $parentW3iPath);
 
-        foreach ($files as $file) {
-            $relativePath = str_replace($sourceDir . DIRECTORY_SEPARATOR, '', $file->getRealPath());
-            $targetFile = $targetDir . DIRECTORY_SEPARATOR . $relativePath;
+        $jsonPath = $parentW3iPath . '.json';
+        MapConverterService::convertToJson($parentW3iPath, $parentW3iPath);
 
-            $targetDirPath = dirname($targetFile);
-            if (!File::exists($targetDirPath)) {
-                File::makeDirectory($targetDirPath, 0777, true);
+        $json = json_decode(file_get_contents($jsonPath), true);
+        $info = $projectData['info'] ?? [];
+
+        // Patch map fields
+        $mapInfo = $info['map'] ?? [];
+        foreach ($mapInfo as $key => $value) {
+            $json['map'][$key] = $value;
+        }
+
+        // Patch players by index
+        foreach (($info['players'] ?? []) as $i => $player) {
+            if (isset($json['players'][$i])) {
+                $json['players'][$i]['name'] = $player['name'];
             }
+        }
 
-            File::copy($file->getRealPath(), $targetFile);
+        // Patch forces by index
+        foreach (($info['forces'] ?? []) as $i => $force) {
+            if (isset($json['forces'][$i])) {
+                $json['forces'][$i]['name'] = $force['name'];
+            }
+        }
+
+        file_put_contents($jsonPath, json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        $outputDir = dirname($parentW3iPath);
+        MapConverterService::convertToWar($jsonPath, $parentW3iPath);
+        $toolOutput = $outputDir . DIRECTORY_SEPARATOR . pathinfo($parentW3iPath, PATHINFO_FILENAME);
+        if (file_exists($toolOutput)) {
+            if (file_exists($parentW3iPath)) {
+                unlink($parentW3iPath);
+            }
+            rename($toolOutput, $parentW3iPath);
         }
     }
 
@@ -314,6 +244,12 @@ class FileProcessorService
             if (!file_exists($selectedChildFilePath)) {
                 return response()->json(['success' => false, 'message' => "Файл не найден в выбранном проекте: $file"]);
             }
+
+            if ($file === 'war3map.w3i') {
+                self::patchMapInfo($selectedChildFilePath, $parentFilePath, $projects[$select]);
+                continue;
+            }
+
             if (!copy($selectedChildFilePath, $parentFilePath)) {
                 return response()->json(['success' => false, 'message' => "Ошибка загрузки из выбранного проекта: $file"]);
             }

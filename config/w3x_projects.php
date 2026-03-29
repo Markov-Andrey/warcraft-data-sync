@@ -6,10 +6,40 @@ return [
     'child_projects' => [
         'alterac' => [
             'key' => 'alterac',
-            'name' => 'Alterac',
-            'description' => 'Some description for Alterac',
-            'type_game' => 'PvE 2vE',
-            'author' => 'AMarkov',
+            'name' => "Alterac's Justice",
+            'info' => [ // w3i
+                'map' => [
+                    'name' => "Alterac's Justice",
+                    'description' => 'Some description for Alterac',
+                    'recommendedPlayers' => 'PvE 2vE',
+                    'author' => 'AMarkov',
+                ],
+                'players' => [
+                    [
+                        'name' => 'P1',
+                    ],
+                    [
+                        'name' => 'P2',
+                    ],
+                    [
+                        'name' => 'Stonebeard',
+                    ],
+                    [
+                        'name' => 'Syndicate Army',
+                    ],
+                    [
+                        'name' => 'Syndicate Caravan',
+                    ],
+                ],
+                'forces' => [
+                    [
+                        'name' => 'Players',
+                    ],
+                    [
+                        'name' => 'Syndicate',
+                    ],
+                ],
+            ],
             'path' => "C:\\Users\\Markov\\Documents\\Warcraft III\\Maps\\legends\\Child\\AlteracJustice.w3x",
             'individual' => [
                 'Maps\\Alterac',
@@ -21,10 +51,15 @@ return [
         ],
         'silithus' => [
             'key' => 'silithus',
-            'name' => 'Silithus',
-            'description' => 'Some description for Silithus',
-            'type_game' => 'PvE 2vE',
-            'author' => 'AMarkov',
+            'name' => 'Voices of the Sands',
+            'info' => [ // w3i
+                'map' => [
+                    'name' => 'Voices of the Sands',
+                    'description' => 'Some description for Silithus',
+                    'recommendedPlayers' => 'PvE 2vE',
+                    'author' => 'AMarkov',
+                ],
+            ],
             'path' => "C:\\Users\\Markov\\Documents\\Warcraft III\\Maps\\legends\\Child\\VoicesOfSands.w3x",
             'individual' => [
                 'Maps\\Silithus',
@@ -33,10 +68,15 @@ return [
         ],
         'warsong' => [
             'key' => 'warsong',
-            'name' => 'Warsong',
-            'description' => 'Some description for Warsong',
-            'type_game' => 'PvP 2v2',
-            'author' => 'AMarkov',
+            'name' => 'Warsong Gulch',
+            'info' => [ // w3i
+                'map' => [
+                    'name' => 'Warsong Gulch',
+                    'description' => 'Some description for Warsong',
+                    'recommendedPlayers' => 'PvP 2v2',
+                    'author' => 'AMarkov',
+                ],
+            ],
             'path' => "C:\\Users\\Markov\\Documents\\Warcraft III\\Maps\\legends\\Child\\WarsongGulch.w3x",
             'individual' => [
                 'Maps\\Warsong',
