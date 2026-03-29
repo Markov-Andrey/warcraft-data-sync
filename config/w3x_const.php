@@ -13,7 +13,7 @@ return [
         'war3map.mmp', // Minimap icons during initialization
         'war3map.w3c', // Camera parameters
         'war3map.w3r', // Info by regions
-        'war3map.w3s', // Sounds are set
+        // 'war3map.w3s', // Sounds are set. File not used
         'FullScreen.blp', // Map preview screen
     ],
     // Technical files

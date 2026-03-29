@@ -279,31 +279,46 @@ class FileProcessorService
         $swapFiles = $w3xConst['copy'] ?? [];
         $projects = PathService::getChildProject();
         $parentProjectPath = PathService::getParentProjectPath();
+        $currentProject = InfoConfigService::load('current_project');
 
         if (!isset($projects[$select])) {
             return response()->json(['success' => false, 'message' => 'Проект не найден']);
         }
 
-        $childProjectDir = $projects[$select]['path'];
+        // Step 1: parent → current child (save parent state into current child before switching)
+        if ($currentProject && isset($projects[$currentProject])) {
+            $currentChildDir = $projects[$currentProject]['path'];
+            foreach ($swapFiles as $file) {
+                if (!is_string($file)) {
+                    continue;
+                }
+                $parentFilePath = $parentProjectPath . DIRECTORY_SEPARATOR . $file;
+                $currentChildFilePath = $currentChildDir . DIRECTORY_SEPARATOR . $file;
+                if (!file_exists($parentFilePath)) {
+                    return response()->json(['success' => false, 'message' => "Файл не найден в родителе: $file"]);
+                }
+                if (!copy($parentFilePath, $currentChildFilePath)) {
+                    return response()->json(['success' => false, 'message' => "Ошибка сохранения в текущий проект: $file"]);
+                }
+            }
+        }
 
+        // Step 2: selected child → parent (load selected child's files into parent)
+        $selectedChildDir = $projects[$select]['path'];
         foreach ($swapFiles as $file) {
             if (!is_string($file)) {
                 continue;
             }
-
-            $childFilePath = $childProjectDir . DIRECTORY_SEPARATOR . $file;
+            $selectedChildFilePath = $selectedChildDir . DIRECTORY_SEPARATOR . $file;
             $parentFilePath = $parentProjectPath . DIRECTORY_SEPARATOR . $file;
-
-            if (!file_exists($childFilePath)) {
-                continue;
+            if (!file_exists($selectedChildFilePath)) {
+                return response()->json(['success' => false, 'message' => "Файл не найден в выбранном проекте: $file"]);
             }
-            if (!is_writable($parentProjectPath)) {
-                return response()->json(['success' => false, 'message' => "Нет прав на запись"]);
-            }
-            if (!copy($childFilePath, $parentFilePath)) {
-                return response()->json(['success' => false, 'message' => "Ошибка копирования $file"]);
+            if (!copy($selectedChildFilePath, $parentFilePath)) {
+                return response()->json(['success' => false, 'message' => "Ошибка загрузки из выбранного проекта: $file"]);
             }
         }
+
         InfoConfigService::selectedProject($select);
 
         return response()->json(['success' => true, 'message' => 'Файлы успешно заменены']);
