@@ -20,6 +20,7 @@ return [
     'exceptions' => [
         '.data-sync',
         'war3map.w3u.json',
+        'war3map.w3i.json',
         'war3map.wts.json',
         'war3mapSkin.w3u.json',
     ],
